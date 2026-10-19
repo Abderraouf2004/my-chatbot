@@ -59,4 +59,14 @@ export const ConversationController = {
     );
     res.status(201).json({ data, message: "Message created successfully" });
   }),
+  getmessages: tryCatch(async (req: Request, res: Response) => {
+    const pagination = req.query as unknown as PaginationQuery;
+    const { data, meta } = await ConversationService.getmessages(
+      req.params.id as string,
+      pagination,
+    );
+    res
+      .status(200)
+      .json({ data, meta, message: "messages retrieved successfully" });
+  }),
 };

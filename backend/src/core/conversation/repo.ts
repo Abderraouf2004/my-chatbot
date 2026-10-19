@@ -109,4 +109,23 @@ export const ConversationRepo = {
     });
     return message;
   },
+  getmessages: async (Id: string, pagination: PaginationQuery) => {
+    const { skip, take } = toSkipTake(pagination);
+    const [messages, total] = await prisma.$transaction([
+      prisma.message.findMany({
+        where: {
+          conversationId: Id,
+        },
+        orderBy: { createdAt: "desc" },
+        skip,
+        take,
+      }),
+      prisma.message.count({
+        where: {
+          conversationId: Id,
+        },
+      }),
+    ]);
+    return { messages, total };
+  },
 };

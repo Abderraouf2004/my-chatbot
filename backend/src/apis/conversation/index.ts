@@ -34,6 +34,12 @@ conversation.post(
 );
 
 conversation.get(
+  "/:id/messages",
+  authMiddleware,
+  validateRequestInput({ params: IdParamSchema, query: PaginationQuerySchema }),
+  ConversationController.getmessages,
+);
+conversation.get(
   "/:id",
   authMiddleware,
   validateRequestInput({ params: IdParamSchema }),

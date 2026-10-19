@@ -50,4 +50,13 @@ export const ConversationService = {
     const message = await ConversationRepo.createmessage(id, data, userId);
     return validateObject<Conversation.DTOMessage>(MessageDTOSchema, message);
   },
+  getmessages: async (Id: string, pagination: PaginationQuery) => {
+    const data = await ConversationRepo.getmessages(Id, pagination);
+    return {
+      data: data.messages.map((message) =>
+        validateObject<Conversation.DTOMessage>(MessageDTOSchema, message),
+      ),
+      meta: buildPaginationMeta(data.total, pagination),
+    };
+  },
 };
