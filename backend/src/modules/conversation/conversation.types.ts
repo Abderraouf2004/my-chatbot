@@ -13,6 +13,5 @@ export namespace Conversation {
 
   export interface Update {
     title?: string;
-    description?: string;
   }
 }

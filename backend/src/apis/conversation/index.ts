@@ -3,10 +3,11 @@ import { validateRequestInput } from "../../errors/validate-request-input";
 import {
   CreateConversationSchema,
   IdParamSchema,
+  UpdateConversationSchema,
 } from "../../modules/conversation/conversation.schema";
 import { ConversationController } from "../../core/conversation/controller";
 import { authMiddleware } from "../../middleware/auth";
-// import { PaginationQuerySchema } from "../../modules/shared/pagination.schema";
+import { PaginationQuerySchema } from "../../modules/shared/pagination.schema";
 
 const conversation = Router();
 
@@ -17,39 +18,35 @@ conversation.post(
   ConversationController.create,
 );
 
-// conversation.get(
-//   "/",
-//   authMiddleware,
-//   validateRequestInput({ query: PaginationQuerySchema }),
-//   DocumentController.getAll,
-// );
+conversation.get(
+  "/",
+  authMiddleware,
+  validateRequestInput({ query: PaginationQuerySchema }),
+  ConversationController.getAll,
+);
 
-// conversation.get(
-//   "/:id/download",
-//   authMiddleware,
-//   validateRequestInput({ params: IdParamSchema }),
-//   DocumentController.download,
-// );
+conversation.get(
+  "/:id",
+  authMiddleware,
+  validateRequestInput({ params: IdParamSchema }),
+  ConversationController.getById,
+);
 
-// conversation.get(
-//   "/:id",
-//   authMiddleware,
-//   validateRequestInput({ params: IdParamSchema }),
-//   DocumentController.getById,
-// );
+conversation.put(
+  "/:id",
+  authMiddleware,
+  validateRequestInput({
+    params: IdParamSchema,
+    body: UpdateConversationSchema,
+  }),
+  ConversationController.update,
+);
 
-// conversation.put(
-//   "/:id",
-//   authMiddleware,
-//   validateRequestInput({ params: IdParamSchema, body: UpdateDocumentSchema }),
-//   DocumentController.update,
-// );
-
-// conversation.delete(
-//   "/:id",
-//   authMiddleware,
-//   validateRequestInput({ params: IdParamSchema }),
-//   DocumentController.delete,
-// );
+conversation.delete(
+  "/:id",
+  authMiddleware,
+  validateRequestInput({ params: IdParamSchema }),
+  ConversationController.delete,
+);
 
 export default conversation;
