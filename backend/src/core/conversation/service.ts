@@ -1,7 +1,10 @@
 import { validateObject } from "../../errors/validate-object";
 import type { Conversation } from "../../modules/conversation/conversation.types";
 import { ConversationRepo } from "./repo";
-import { ConversationDTOSchema } from "../../modules/conversation/conversation.schema";
+import {
+  ConversationDTOSchema,
+  MessageDTOSchema,
+} from "../../modules/conversation/conversation.schema";
 // import { ApiError } from "../../errors/api-error";
 import {
   buildPaginationMeta,
@@ -37,5 +40,14 @@ export const ConversationService = {
   getById: async (id: string, userId: string) => {
     const data = await ConversationRepo.getById(id, userId);
     return validateObject<Conversation.DTO>(ConversationDTOSchema, data);
+  },
+
+  createmessage: async (
+    id: string,
+    data: Conversation.CreateMessage,
+    userId: string,
+  ) => {
+    const message = await ConversationRepo.createmessage(id, data, userId);
+    return validateObject<Conversation.DTOMessage>(MessageDTOSchema, message);
   },
 };

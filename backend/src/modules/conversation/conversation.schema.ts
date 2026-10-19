@@ -18,3 +18,15 @@ export const ConversationDTOSchema = Joi.object({
   updatedAt: Joi.date().required(),
   createdAt: Joi.date().required(),
 });
+
+export const MessageDTOSchema = Joi.object({
+  id: Joi.string().uuid().required(),
+  conversationId: Joi.string().uuid().required(),
+  role: Joi.string().required(),
+  content: Joi.string().min(2).required(),
+  createdAt: Joi.date().required(),
+});
+
+export const CreateMessageSchema = Joi.object({
+  content: Joi.string().min(2).required(),
+});

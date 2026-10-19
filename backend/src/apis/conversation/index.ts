@@ -2,6 +2,7 @@ import { Router } from "express";
 import { validateRequestInput } from "../../errors/validate-request-input";
 import {
   CreateConversationSchema,
+  CreateMessageSchema,
   IdParamSchema,
   UpdateConversationSchema,
 } from "../../modules/conversation/conversation.schema";
@@ -23,6 +24,13 @@ conversation.get(
   authMiddleware,
   validateRequestInput({ query: PaginationQuerySchema }),
   ConversationController.getAll,
+);
+
+conversation.post(
+  "/:id/messages",
+  authMiddleware,
+  validateRequestInput({ params: IdParamSchema, body: CreateMessageSchema }),
+  ConversationController.createmessage,
 );
 
 conversation.get(

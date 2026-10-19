@@ -84,4 +84,29 @@ export const ConversationRepo = {
       where: { id },
     });
   },
+  createmessage: async (
+    id: string,
+    data: Conversation.CreateMessage,
+    userId: string,
+  ) => {
+    const conversation = await prisma.conversation.findFirst({
+      where: { id, userId },
+    });
+
+    if (!conversation) {
+      throw new ApiError({
+        code: "NOT_FOUND",
+        message: "this conversation is not exist!",
+      });
+    }
+
+    const message = await prisma.message.create({
+      data: {
+        conversationId: id,
+        role: "user",
+        content: data.content,
+      },
+    });
+    return message;
+  },
 };

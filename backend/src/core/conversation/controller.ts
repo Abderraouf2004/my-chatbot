@@ -51,4 +51,12 @@ export const ConversationController = {
       .status(200)
       .json({ data, message: "Conversation retrieved successfully" });
   }),
+  createmessage: tryCatch(async (req: Request, res: Response) => {
+    const data = await ConversationService.createmessage(
+      req.params.id as string,
+      req.body,
+      req.user?.id as string,
+    );
+    res.status(201).json({ data, message: "Message created successfully" });
+  }),
 };
