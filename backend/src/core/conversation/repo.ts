@@ -107,7 +107,17 @@ export const ConversationRepo = {
         content: data.content,
       },
     });
+
     return message;
+  },
+  createAssistantMessage: async (id: string, content: string) => {
+    return prisma.message.create({
+      data: {
+        conversationId: id,
+        role: "assistant",
+        content,
+      },
+    });
   },
   getmessages: async (Id: string, pagination: PaginationQuery) => {
     const { skip, take } = toSkipTake(pagination);

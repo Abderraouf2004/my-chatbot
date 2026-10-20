@@ -10,6 +10,7 @@ import {
   buildPaginationMeta,
   type PaginationQuery,
 } from "../../modules/shared/pagination.schema";
+import { generateResponse } from "../../services/gemini";
 export const ConversationService = {
   create: async (data: Conversation.Create, userId: string) => {
     const conversation = await ConversationRepo.create(data, userId);
@@ -48,7 +49,23 @@ export const ConversationService = {
     userId: string,
   ) => {
     const message = await ConversationRepo.createmessage(id, data, userId);
-    return validateObject<Conversation.DTOMessage>(MessageDTOSchema, message);
+    const aiContent = await generateResponse(data.content);
+
+    const assistantMessage = await ConversationRepo.createAssistantMessage(
+      id,
+      aiContent,
+    );
+    // return validateObject<Conversation.DTOMessage>(MessageDTOSchema, message);
+    return {
+      userMessage: validateObject<Conversation.DTOMessage>(
+        MessageDTOSchema,
+        message,
+      ),
+      assistantMessage: validateObject<Conversation.DTOMessage>(
+        MessageDTOSchema,
+        assistantMessage,
+      ),
+    };
   },
   getmessages: async (Id: string, pagination: PaginationQuery) => {
     const data = await ConversationRepo.getmessages(Id, pagination);
