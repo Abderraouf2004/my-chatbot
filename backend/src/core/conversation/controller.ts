@@ -64,6 +64,7 @@ export const ConversationController = {
     const { data, meta } = await ConversationService.getmessages(
       req.params.id as string,
       pagination,
+      req.user?.id as string,
     );
     res
       .status(200)

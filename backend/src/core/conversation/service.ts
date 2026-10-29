@@ -67,8 +67,12 @@ export const ConversationService = {
       ),
     };
   },
-  getmessages: async (Id: string, pagination: PaginationQuery) => {
-    const data = await ConversationRepo.getmessages(Id, pagination);
+  getmessages: async (
+    Id: string,
+    pagination: PaginationQuery,
+    userId: string,
+  ) => {
+    const data = await ConversationRepo.getmessages(Id, pagination, userId);
     return {
       data: data.messages.map((message) =>
         validateObject<Conversation.DTOMessage>(MessageDTOSchema, message),

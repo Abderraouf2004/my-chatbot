@@ -119,7 +119,21 @@ export const ConversationRepo = {
       },
     });
   },
-  getmessages: async (Id: string, pagination: PaginationQuery) => {
+  getmessages: async (
+    Id: string,
+    pagination: PaginationQuery,
+    userId: string,
+  ) => {
+    const conversation = await prisma.conversation.findFirst({
+      where: { id: Id, userId },
+    });
+
+    if (!conversation) {
+      throw new ApiError({
+        code: "FORBIDDEN",
+        message: "You do not have permission to access this conversation.",
+      });
+    }
     const { skip, take } = toSkipTake(pagination);
     const [messages, total] = await prisma.$transaction([
       prisma.message.findMany({
