@@ -12,7 +12,8 @@ export const authMiddleware = async (
   const authHeader = req.headers["authorization"] as string;
   const token = getBearerToken(authHeader);
 
-  const payload = tokenService.verifyToken(token, false);
+  // const payload = tokenService.verifyToken(token, false);
+  const payload = tokenService.verifyToken(token, "access");
   const redis = redisService.getClient();
 
   const key = `blacklist:${token}`;

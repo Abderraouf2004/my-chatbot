@@ -243,8 +243,8 @@ function App() {
   return <main className={`app-shell ${dark ? 'theme-dark' : 'theme-light'}`}>
     {sidebarOpen && <button className="mobile-scrim" aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} />}
     <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-      <div className="sidebar-top"><a className="brand" href="#home"><span className="brand-mark"><Icon name="sparkle" size={20} /></span><span>nova<span className="brand-light">.ai</span></span></a><button className="icon-button sidebar-collapse" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar"><Icon name="menu" /></button></div>
-      <button className="new-chat-button" onClick={() => void createConversation()}><Icon name="plus" size={18} /><span>New chat</span><kbd>⌘ K</kbd></button>
+      <div className="sidebar-top"><a className="brand" href="#home"><span className="brand-mark"><Icon name="sparkle" size={20} /></span><span>chat<span className="brand-light">.ai</span></span></a><button className="icon-button sidebar-collapse" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar"><Icon name="menu" /></button></div>
+      <button className="new-chat-button" onClick={() => void createConversation()}><Icon name="plus" size={18} /><span>New chat</span></button>
       <label className="search-box"><Icon name="search" size={16} /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations" /></label>
       <div className="side-section-label">YOUR SPACE <span>{conversations.length}</span></div>
       <div className="conversation-list">

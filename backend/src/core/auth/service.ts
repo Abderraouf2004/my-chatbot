@@ -9,7 +9,8 @@ import { getBearerToken } from "../../services/auth-header";
 export const AuthService = {
   verifyToken: async (authHeader: string | undefined) => {
     const token = getBearerToken(authHeader);
-    const payload = tokenService.verifyToken(token, false);
+    // const payload = tokenService.verifyToken(token, false);
+    const payload = tokenService.verifyToken(token, "access");
 
     if (!payload) {
       throw new ApiError({
@@ -55,13 +56,10 @@ export const AuthService = {
       ...data,
       password: hashedPassword,
     });
-    const payload = {
-      id: user.id,
-    };
 
     return {
-      accessToken: tokenService.generateToken(payload, "15m"),
-      refreshToken: tokenService.generateToken(payload, "30d"),
+      accessToken: tokenService.generateToken(user.id, "access", "15m"),
+      refreshToken: tokenService.generateToken(user.id, "refresh", "30d"),
     };
   },
 
@@ -86,13 +84,9 @@ export const AuthService = {
       });
     }
 
-    const payload = {
-      id: user.id,
-    };
-
     return {
-      accessToken: tokenService.generateToken(payload, "15m"),
-      refreshToken: tokenService.generateToken(payload, "7d"),
+      accessToken: tokenService.generateToken(user.id, "access", "15m"),
+      refreshToken: tokenService.generateToken(user.id, "refresh", "7d"),
     };
   },
 
@@ -110,7 +104,8 @@ export const AuthService = {
         details: "This token has been revoked. Please sign in again.",
       });
     }
-    const payload = tokenService.verifyToken(token, true);
+    // const payload = tokenService.verifyToken(token, true);
+    const payload = tokenService.verifyToken(token, "refresh");
 
     if (!payload) {
       throw new ApiError({
@@ -121,12 +116,13 @@ export const AuthService = {
     }
 
     return {
-      accessToken: tokenService.generateToken(
-        {
-          id: payload.id,
-        },
-        "15m",
-      ),
+      // accessToken: tokenService.generateToken(
+      //   {
+      //     id: payload.id,
+      //   },
+      //   "15m",
+      // ),
+      accessToken: tokenService.generateToken(payload.id, "access", "15m"),
     };
   },
 

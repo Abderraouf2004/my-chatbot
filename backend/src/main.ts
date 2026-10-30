@@ -2,9 +2,14 @@ import express from "express";
 import router from "./apis";
 import { redisService } from "./services/redis";
 import cors from "cors";
+import helmet from "helmet";
 const app = express();
 app.set("trust proxy", 1);
-
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }),
+);
 app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   next();
