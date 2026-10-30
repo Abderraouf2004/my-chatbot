@@ -140,7 +140,7 @@ export const ConversationRepo = {
         where: {
           conversationId: Id,
         },
-        orderBy: { createdAt: "asc" },
+        orderBy: { createdAt: "desc" },
         skip,
         take,
       }),

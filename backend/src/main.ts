@@ -1,7 +1,7 @@
 import express from "express";
 import router from "./apis";
 import { redisService } from "./services/redis";
-
+import cors from "cors";
 const app = express();
 app.set("trust proxy", 1);
 
@@ -10,7 +10,12 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL,
+    credentials: true,
+  }),
+);
 const PORT = process.env.PORT || 3000;
 app.use("/api", router);
 let server: ReturnType<typeof app.listen>;
