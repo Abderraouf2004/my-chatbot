@@ -6,10 +6,12 @@ import { tokenService } from "../../services/token";
 import { redisService } from "../../services/redis";
 import jwt from "jsonwebtoken";
 import { getBearerToken } from "../../services/auth-header";
+import { requireToken } from "../../services/auth-header";
 export const AuthService = {
-  verifyToken: async (authHeader: string | undefined) => {
-    const token = getBearerToken(authHeader);
-    // const payload = tokenService.verifyToken(token, false);
+  // verifyToken: async (authHeader: string | undefined) => {
+  //   const token = getBearerToken(authHeader);
+  verifyToken: async (accessToken: string | undefined) => {
+    const token = requireToken(accessToken);
     const payload = tokenService.verifyToken(token, "access");
 
     if (!payload) {
@@ -59,7 +61,7 @@ export const AuthService = {
 
     return {
       accessToken: tokenService.generateToken(user.id, "access", "15m"),
-      refreshToken: tokenService.generateToken(user.id, "refresh", "30d"),
+      refreshToken: tokenService.generateToken(user.id, "refresh", "7d"),
     };
   },
 
@@ -90,8 +92,38 @@ export const AuthService = {
     };
   },
 
-  refreshToken: async (authHeader: string | undefined) => {
-    const token = getBearerToken(authHeader);
+  // refreshToken: async (authHeader: string | undefined) => {
+  //   const token = getBearerToken(authHeader);
+  // refreshToken: async (refreshToken: string | undefined) => {
+  //   const token = requireToken(refreshToken);
+
+  //   const redis = redisService.getClient();
+
+  //   const isBlacklisted = await redis.get(`blacklist:${token}`);
+
+  //   if (isBlacklisted) {
+  //     throw new ApiError({
+  //       code: "UNAUTHORIZED",
+  //       message: "Token revoked",
+  //       details: "This token has been revoked. Please sign in again.",
+  //     });
+  //   }
+  //   const payload = tokenService.verifyToken(token, "refresh");
+
+  //   if (!payload) {
+  //     throw new ApiError({
+  //       code: "UNAUTHORIZED",
+  //       message: "Invalid refresh token",
+  //       details: "The refresh token provided is invalid or has expired.",
+  //     });
+  //   }
+
+  //   return {
+  //     accessToken: tokenService.generateToken(payload.id, "access", "15m"),
+  //   };
+  // },
+  refreshToken: async (refreshToken: string | undefined) => {
+    const token = requireToken(refreshToken);
 
     const redis = redisService.getClient();
 
@@ -101,41 +133,70 @@ export const AuthService = {
       throw new ApiError({
         code: "UNAUTHORIZED",
         message: "Token revoked",
-        details: "This token has been revoked. Please sign in again.",
+        details: "Please sign in again.",
       });
     }
-    // const payload = tokenService.verifyToken(token, true);
+
     const payload = tokenService.verifyToken(token, "refresh");
 
-    if (!payload) {
+    const decoded = jwt.decode(token) as { exp?: number } | null;
+
+    const ttl = decoded?.exp ? decoded.exp - Math.floor(Date.now() / 1000) : 0;
+
+    if (ttl <= 0) {
       throw new ApiError({
         code: "UNAUTHORIZED",
-        message: "Invalid refresh token",
-        details: "The refresh token provided is invalid or has expired.",
+        message: "Refresh token expired",
+        details: "Please sign in again.",
       });
     }
 
+    await redis.setEx(`blacklist:${token}`, ttl, "blacklisted");
+
     return {
-      // accessToken: tokenService.generateToken(
-      //   {
-      //     id: payload.id,
-      //   },
-      //   "15m",
-      // ),
       accessToken: tokenService.generateToken(payload.id, "access", "15m"),
+      refreshToken: tokenService.generateToken(payload.id, "refresh", "7d"),
     };
   },
 
-  signOut: async (authHeader: string | undefined) => {
-    const token = getBearerToken(authHeader);
+  // signOut: async (authHeader: string | undefined) => {
+  //   const token = getBearerToken(authHeader);
 
-    const decoded = jwt.decode(token) as { exp?: number } | null;
-    const ttl = decoded?.exp ? decoded.exp - Math.floor(Date.now() / 1000) : 0;
+  //   const decoded = jwt.decode(token) as { exp?: number } | null;
+  //   const ttl = decoded?.exp ? decoded.exp - Math.floor(Date.now() / 1000) : 0;
 
-    if (ttl > 0) {
-      const redis = redisService.getClient();
+  //   if (ttl > 0) {
+  //     const redis = redisService.getClient();
 
-      await redis.setEx(`blacklist:${token}`, ttl, "blacklisted");
+  //     await redis.setEx(`blacklist:${token}`, ttl, "blacklisted");
+  //   }
+  // },
+  signOut: async (
+    accessToken: string | undefined,
+    refreshToken: string | undefined,
+  ) => {
+    const redis = redisService.getClient();
+
+    for (const [token, type] of [
+      [accessToken, "access"],
+      [refreshToken, "refresh"],
+    ] as const) {
+      if (!token) continue;
+
+      try {
+        tokenService.verifyToken(token, type);
+      } catch {
+        continue;
+      }
+
+      const decoded = jwt.decode(token) as { exp?: number } | null;
+      const ttl = decoded?.exp
+        ? decoded.exp - Math.floor(Date.now() / 1000)
+        : 0;
+
+      if (ttl > 0) {
+        await redis.setEx(`blacklist:${token}`, ttl, "blacklisted");
+      }
     }
   },
 };

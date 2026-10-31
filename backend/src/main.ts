@@ -3,6 +3,8 @@ import router from "./apis";
 import { redisService } from "./services/redis";
 import cors from "cors";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
+
 const app = express();
 app.set("trust proxy", 1);
 app.use(
@@ -14,13 +16,16 @@ app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   next();
 });
-app.use(express.json());
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   }),
 );
+app.use(cookieParser());
+app.use(express.json());
+
 const PORT = process.env.PORT || 3000;
 app.use("/api", router);
 let server: ReturnType<typeof app.listen>;

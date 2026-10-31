@@ -2,7 +2,6 @@ import { Router } from "express";
 import { validateRequestInput } from "../../errors/validate-request-input";
 import { signinSchema, signupSchema } from "../../modules/auth/auth.schema";
 import { AuthController } from "../../core/auth/controller";
-// import googleRouter from "./oauth";
 
 const auth = Router();
 
@@ -22,7 +21,5 @@ auth.post(
   validateRequestInput({ body: signinSchema }),
   AuthController.signin,
 );
-
-// auth.use("/oauth",googleRouter);
 
 export default auth;

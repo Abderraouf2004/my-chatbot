@@ -8,16 +8,20 @@ type Message = { id: string; conversationId: string; role: 'user' | 'assistant' 
 type ApiEnvelope<T> = { data: T; message?: string; meta?: { page: number; totalPages: number; total: number } }
 
 const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')
-const TOKEN_KEY = 'my-chatbot.access-token'
-const REFRESH_KEY = 'my-chatbot.refresh-token'
+
 
 async function api<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
   const headers = new Headers(options.headers)
   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-  if (token) headers.set('Authorization', `Bearer ${token}`)
+  // if (token) headers.set('Authorization', `Bearer ${token}`)
   let response: Response
   try {
-    response = await fetch(`${API_URL}${path}`, { ...options, headers })
+    // response = await fetch(`${API_URL}${path}`, { ...options, headers })
+    response = await fetch(`${API_URL}${path}`, {
+  ...options,
+  headers,
+  credentials: "include",
+});
   } catch {
     throw new Error(`Cannot connect to the API at ${API_URL}. Make sure the backend is running.`)
   }
