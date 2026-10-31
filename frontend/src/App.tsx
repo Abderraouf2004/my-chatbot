@@ -1,56 +1,148 @@
+
+
+
 // import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 // import type { FormEvent, KeyboardEvent, ReactNode } from 'react'
 // import './App.css'
 
 // type User = { id: string }
-// type Conversation = { id: string; title: string; createdAt: string; updatedAt: string }
-// type Message = { id: string; conversationId: string; role: 'user' | 'assistant' | string; content: string; createdAt: string }
-// type ApiEnvelope<T> = { data: T; message?: string; meta?: { page: number; totalPages: number; total: number } }
 
-// const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '')
+// type Conversation = {
+//   id: string
+//   title: string
+//   createdAt: string
+//   updatedAt: string
+// }
 
+// type Message = {
+//   id: string
+//   conversationId: string
+//   role: 'user' | 'assistant' | string
+//   content: string
+//   createdAt: string
+// }
 
-// async function api<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
-//   const headers = new Headers(options.headers)
-//   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json')
-//   // if (token) headers.set('Authorization', `Bearer ${token}`)
-//   let response: Response
-//   try {
-//     // response = await fetch(`${API_URL}${path}`, { ...options, headers })
-//     response = await fetch(`${API_URL}${path}`, {
-//   ...options,
-//   headers,
-//   credentials: "include",
-// });
-//   } catch {
-//     throw new Error(`Cannot connect to the API at ${API_URL}. Make sure the backend is running.`)
+// type ApiEnvelope<T> = {
+//   data: T
+//   message?: string
+//   meta?: {
+//     page: number
+//     totalPages: number
+//     total: number
 //   }
-//   const payload = await response.json().catch(() => ({})) as Record<string, unknown>
+// }
+
+// const API_URL = (
+//   import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// ).replace(/\/$/, '')
+
+// // --------------------------------------------------
+// // API CLIENT
+// // --------------------------------------------------
+
+// async function api<T>(
+//   path: string,
+//   options: RequestInit = {}
+// ): Promise<T> {
+//   const headers = new Headers(options.headers)
+
+//   if (options.body && !headers.has('Content-Type')) {
+//     headers.set('Content-Type', 'application/json')
+//   }
+
+//   let response: Response
+
+//   try {
+//     response = await fetch(`${API_URL}${path}`, {
+//       ...options,
+//       headers,
+//       credentials: 'include',
+//     })
+//   } catch {
+//     throw new Error(
+//       `Cannot connect to the API at ${API_URL}. Make sure the backend is running.`
+//     )
+//   }
+
+//   const payload = await response
+//     .json()
+//     .catch(() => ({})) as Record<string, unknown>
+
 //   if (!response.ok) {
-//     const message = typeof payload.message === 'string' ? payload.message : typeof payload.error === 'string' ? payload.error : `Request failed (${response.status})`
+//     const message =
+//       typeof payload.message === 'string'
+//         ? payload.message
+//         : typeof payload.error === 'string'
+//           ? payload.error
+//           : `Request failed (${response.status})`
+
 //     throw new Error(message)
 //   }
+
 //   return payload as T
 // }
 
-// function Icon({ name, size = 18 }: { name: string; size?: number }) {
+// // --------------------------------------------------
+// // ICON
+// // --------------------------------------------------
+
+// function Icon({
+//   name,
+//   size = 18,
+// }: {
+//   name: string
+//   size?: number
+// }) {
 //   const paths: Record<string, ReactNode> = {
 //     plus: <><path d="M12 5v14M5 12h14" /></>,
+
 //     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
+
 //     message: <><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z" /></>,
+
 //     send: <><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></>,
+
 //     trash: <><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6" /></>,
+
 //     edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" /></>,
+
 //     logout: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></>,
+
 //     menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>,
+
 //     sparkle: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2Z" /><path d="m19 14 1.2 2.8L23 18l-2.8 1.1L19 22l-1.1-2.9L15 18l2.9-1.2Z" /></>,
+
 //     close: <><path d="m18 6-12 12M6 6l12 12" /></>,
+
 //     sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></>,
 //   }
-//   return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{paths[name] || paths.sparkle}</svg>
+
+//   return (
+//     <svg
+//       width={size}
+//       height={size}
+//       viewBox="0 0 24 24"
+//       fill="none"
+//       stroke="currentColor"
+//       strokeWidth="1.7"
+//       strokeLinecap="round"
+//       strokeLinejoin="round"
+//       aria-hidden="true"
+//     >
+//       {paths[name] || paths.sparkle}
+//     </svg>
+//   )
 // }
 
-// function AuthScreen({ onAuthenticated }: { onAuthenticated: (accessToken: string, refreshToken?: string) => void }) {
+// // --------------------------------------------------
+// // AUTH SCREEN
+// // --------------------------------------------------
+
+// function AuthScreen({
+//   onAuthenticated,
+// }: {
+//   onAuthenticated: () => Promise<void>
+// }) {
 //   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
 //   const [name, setName] = useState('')
 //   const [email, setEmail] = useState('')
@@ -60,47 +152,234 @@
 
 //   async function submit(event: FormEvent) {
 //     event.preventDefault()
-//     setBusy(true); setError('')
+
+//     setBusy(true)
+//     setError('')
+
 //     try {
-//       const result = await api<ApiEnvelope<{ accessToken: string; refreshToken: string }>>(`/api/auth/${mode}`, {
-//         method: 'POST', body: JSON.stringify(mode === 'signup' ? { name: name.trim(), email: email.trim(), password } : { email: email.trim(), password }),
+//       await api(`/api/auth/${mode}`, {
+//         method: 'POST',
+//         body: JSON.stringify(
+//           mode === 'signup'
+//             ? {
+//                 name: name.trim(),
+//                 email: email.trim(),
+//                 password,
+//               }
+//             : {
+//                 email: email.trim(),
+//                 password,
+//               }
+//         ),
 //       })
-//       onAuthenticated(result.data.accessToken, result.data.refreshToken)
-//     } catch (err) { setError(err instanceof Error ? err.message : 'Something went wrong.') }
-//     finally { setBusy(false) }
+
+//       await onAuthenticated()
+//     } catch (err) {
+//       setError(
+//         err instanceof Error
+//           ? err.message
+//           : 'Something went wrong.'
+//       )
+//     } finally {
+//       setBusy(false)
+//     }
 //   }
 
-//   return <main className="auth-page">
-//     <div className="auth-glow glow-one" /><div className="auth-glow glow-two" />
-//     <header className="auth-top"><a className="brand" href="#home"><span className="brand-mark"><Icon name="sparkle" size={21} /></span><span>nova<span className="brand-light">.ai</span></span></a><span className="top-note">A clearer way to think.</span></header>
-//     <section className="auth-layout">
-//       <div className="auth-story">
-//         <div className="eyebrow"><span className="eyebrow-dot" /> YOUR AI WORKSPACE</div>
-//         <h1>Ideas become<br /><span>something more.</span></h1>
-//         <p>Meet your thoughtful AI companion. Explore ideas, solve problems, and bring your next big thing to life.</p>
-//         <div className="story-orbit"><div className="orbit orbit-a" /><div className="orbit orbit-b" /><div className="orbit-core"><Icon name="sparkle" size={35} /></div><span className="orbit-star star-a">✳</span><span className="orbit-star star-b">✦</span><span className="orbit-star star-c">✧</span></div>
-//         <div className="story-foot"><span className="avatar-stack"><i>R</i><i>M</i><i>A</i></span><span>Made for curious minds</span><span className="tiny-separator">·</span><span>Powered by AI</span></div>
-//       </div>
-//       <div className="auth-card">
-//         <div className="auth-card-heading"><span className="mini-icon"><Icon name="sparkle" size={19} /></span><div><h2>{mode === 'signin' ? 'Welcome back' : 'Create your account'}</h2><p>{mode === 'signin' ? 'Pick up where your curiosity left off.' : 'Your next great idea starts here.'}</p></div></div>
-//         <div className="auth-tabs"><button className={mode === 'signin' ? 'active' : ''} onClick={() => { setMode('signin'); setError('') }}>Sign in</button><button className={mode === 'signup' ? 'active' : ''} onClick={() => { setMode('signup'); setError('') }}>Create account</button></div>
-//         <form onSubmit={submit} className="auth-form">
-//           {mode === 'signup' && <label>Full name<input autoComplete="name" value={name} onChange={e => setName(e.target.value)} placeholder="Your name" minLength={3} maxLength={30} required /></label>}
-//           <label>Email address<input type="email" autoComplete="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com" required /></label>
-//           <label>Password<input type="password" autoComplete={mode === 'signin' ? 'current-password' : 'new-password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="At least 8 characters" minLength={8} required /></label>
-//           {error && <div className="error-message" role="alert">{error}</div>}
-//           <button className="primary-button auth-submit" disabled={busy}>{busy ? <span className="spinner" /> : mode === 'signin' ? 'Sign in to Nova' : 'Create account'}<span>↗</span></button>
-//         </form>
-//         <p className="auth-terms">By continuing, you agree to our <a href="#terms">Terms</a> and <a href="#privacy">Privacy Policy</a>.</p>
-//       </div>
-//     </section>
-//     <footer className="auth-footer"><span>© 2026 Nova AI</span><span><i /> All systems operational</span><span>Built for what’s next</span></footer>
-//   </main>
+//   return (
+//     <main className="auth-page">
+//       <div className="auth-glow glow-one" />
+//       <div className="auth-glow glow-two" />
+
+//       <header className="auth-top">
+//         <a className="brand" href="#home">
+//           <span className="brand-mark">
+//             <Icon name="sparkle" size={21} />
+//           </span>
+//           <span>
+//             nova<span className="brand-light">.ai</span>
+//           </span>
+//         </a>
+
+//         <span className="top-note">A clearer way to think.</span>
+//       </header>
+
+//       <section className="auth-layout">
+//         <div className="auth-story">
+//           <div className="eyebrow">
+//             <span className="eyebrow-dot" /> YOUR AI WORKSPACE
+//           </div>
+
+//           <h1>
+//             Ideas become<br />
+//             <span>something more.</span>
+//           </h1>
+
+//           <p>
+//             Meet your thoughtful AI companion. Explore ideas, solve problems,
+//             and bring your next big thing to life.
+//           </p>
+
+//           <div className="story-orbit">
+//             <div className="orbit orbit-a" />
+//             <div className="orbit orbit-b" />
+
+//             <div className="orbit-core">
+//               <Icon name="sparkle" size={35} />
+//             </div>
+
+//             <span className="orbit-star star-a">✳</span>
+//             <span className="orbit-star star-b">✦</span>
+//             <span className="orbit-star star-c">✧</span>
+//           </div>
+
+//           <div className="story-foot">
+//             <span className="avatar-stack">
+//               <i>R</i>
+//               <i>M</i>
+//               <i>A</i>
+//             </span>
+
+//             <span>Made for curious minds</span>
+//             <span className="tiny-separator">·</span>
+//             <span>Powered by AI</span>
+//           </div>
+//         </div>
+
+//         <div className="auth-card">
+//           <div className="auth-card-heading">
+//             <span className="mini-icon">
+//               <Icon name="sparkle" size={19} />
+//             </span>
+
+//             <div>
+//               <h2>
+//                 {mode === 'signin'
+//                   ? 'Welcome back'
+//                   : 'Create your account'}
+//               </h2>
+
+//               <p>
+//                 {mode === 'signin'
+//                   ? 'Pick up where your curiosity left off.'
+//                   : 'Your next great idea starts here.'}
+//               </p>
+//             </div>
+//           </div>
+
+//           <div className="auth-tabs">
+//             <button
+//               className={mode === 'signin' ? 'active' : ''}
+//               onClick={() => {
+//                 setMode('signin')
+//                 setError('')
+//               }}
+//             >
+//               Sign in
+//             </button>
+
+//             <button
+//               className={mode === 'signup' ? 'active' : ''}
+//               onClick={() => {
+//                 setMode('signup')
+//                 setError('')
+//               }}
+//             >
+//               Create account
+//             </button>
+//           </div>
+
+//           <form onSubmit={submit} className="auth-form">
+//             {mode === 'signup' && (
+//               <label>
+//                 Full name
+
+//                 <input
+//                   autoComplete="name"
+//                   value={name}
+//                   onChange={e => setName(e.target.value)}
+//                   placeholder="Your name"
+//                   minLength={3}
+//                   maxLength={30}
+//                   required
+//                 />
+//               </label>
+//             )}
+
+//             <label>
+//               Email address
+
+//               <input
+//                 type="email"
+//                 autoComplete="email"
+//                 value={email}
+//                 onChange={e => setEmail(e.target.value)}
+//                 placeholder="you@example.com"
+//                 required
+//               />
+//             </label>
+
+//             <label>
+//               Password
+
+//               <input
+//                 type="password"
+//                 autoComplete={
+//                   mode === 'signin'
+//                     ? 'current-password'
+//                     : 'new-password'
+//                 }
+//                 value={password}
+//                 onChange={e => setPassword(e.target.value)}
+//                 placeholder="At least 8 characters"
+//                 minLength={8}
+//                 required
+//               />
+//             </label>
+
+//             {error && (
+//               <div className="error-message" role="alert">
+//                 {error}
+//               </div>
+//             )}
+
+//             <button
+//               className="primary-button auth-submit"
+//               disabled={busy}
+//             >
+//               {busy
+//                 ? <span className="spinner" />
+//                 : mode === 'signin'
+//                   ? 'Sign in to Nova'
+//                   : 'Create account'}
+
+//               <span>↗</span>
+//             </button>
+//           </form>
+
+//           <p className="auth-terms">
+//             By continuing, you agree to our <a href="#terms">Terms</a> and{' '}
+//             <a href="#privacy">Privacy Policy</a>.
+//           </p>
+//         </div>
+//       </section>
+
+//       <footer className="auth-footer">
+//         <span>© 2026 Nova AI</span>
+//         <span><i /> All systems operational</span>
+//         <span>Built for what’s next</span>
+//       </footer>
+//     </main>
+//   )
 // }
 
+// // --------------------------------------------------
+// // MAIN APP
+// // --------------------------------------------------
+
 // function App() {
-//   const [token, setToken] = useState(() => localStorage.getItem(TOKEN_KEY) || '')
-//   const [refreshToken, setRefreshToken] = useState(() => localStorage.getItem(REFRESH_KEY) || '')
+//   const [isAuthenticated, setIsAuthenticated] = useState(false)
+//   const [authLoading, setAuthLoading] = useState(true)
+
 //   const [user, setUser] = useState<User | null>(null)
 //   const [conversations, setConversations] = useState<Conversation[]>([])
 //   const [activeId, setActiveId] = useState('')
@@ -115,164 +394,933 @@
 //   const [renamingId, setRenamingId] = useState('')
 //   const [renameValue, setRenameValue] = useState('')
 //   const [dark, setDark] = useState(true)
+
 //   const bottomRef = useRef<HTMLDivElement>(null)
 //   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-//   const signOut = useCallback(async () => {
-//     if (token) { try { await api('/api/auth/signout', { method: 'POST' }, token) } catch { /* local sign out still works */ } }
-//     localStorage.removeItem(TOKEN_KEY); localStorage.removeItem(REFRESH_KEY)
-//     setToken(''); setRefreshToken(''); setUser(null); setConversations([]); setMessages([]); setActiveId('')
-//   }, [token])
+//   // --------------------------------------------------
+//   // LOAD CONVERSATIONS
+//   // --------------------------------------------------
 
-//   const authenticate = useCallback((access: string, refresh?: string) => {
-//     localStorage.setItem(TOKEN_KEY, access)
-//     if (refresh) localStorage.setItem(REFRESH_KEY, refresh)
-//     setToken(access); setRefreshToken(refresh || '')
-//   }, [])
+//   const loadConversations = useCallback(async () => {
+//     const result = await api<ApiEnvelope<Conversation[]>>(
+//       '/api/conversation?page=1&limit=100'
+//     )
 
-//   const loadConversations = useCallback(async (access: string) => {
-//     const result = await api<ApiEnvelope<Conversation[]>>('/api/conversation?page=1&limit=100', {}, access)
 //     setConversations(result.data || [])
+
 //     return result.data || []
 //   }, [])
 
+//   // --------------------------------------------------
+//   // AUTHENTICATION
+//   // --------------------------------------------------
+
+//   const authenticate = useCallback(async () => {
+//     // 1. Verify access cookie.
+//     try {
+//       const result = await api<ApiEnvelope<{ user: User }>>(
+//         '/api/auth/verify'
+//       )
+
+//       setUser(result.data.user)
+//       setIsAuthenticated(true)
+
+//       const list = await loadConversations()
+
+//       if (list.length > 0) {
+//         setActiveId(list[0].id)
+//       } else {
+//         setActiveId('')
+//       }
+
+//       return
+//     } catch {
+//       // Access cookie may be expired.
+//     }
+
+//     // 2. Try refreshing using the refresh cookie.
+//     await api('/api/auth/refresh', {
+//       method: 'POST',
+//     })
+
+//     // 3. Verify again with the new access cookie.
+//     const result = await api<ApiEnvelope<{ user: User }>>(
+//       '/api/auth/verify'
+//     )
+
+//     setUser(result.data.user)
+//     setIsAuthenticated(true)
+
+//     const list = await loadConversations()
+
+//     if (list.length > 0) {
+//       setActiveId(list[0].id)
+//     } else {
+//       setActiveId('')
+//     }
+//   }, [loadConversations])
+
+//   // --------------------------------------------------
+//   // SIGN OUT
+//   // --------------------------------------------------
+
+//   const signOut = useCallback(async () => {
+//     try {
+//       await api('/api/auth/signout', {
+//         method: 'POST',
+//       })
+//     } catch {
+//       // Clear frontend state even if signout request fails.
+//     }
+
+//     setIsAuthenticated(false)
+//     setUser(null)
+//     setConversations([])
+//     setMessages([])
+//     setActiveId('')
+//     setDraft('')
+//     setPageError('')
+//   }, [])
+
+//   // --------------------------------------------------
+//   // CHECK SESSION ON APP START
+//   // --------------------------------------------------
+
 //   useEffect(() => {
-//     if (!token) return
 //     let cancelled = false
+
 //     async function boot() {
 //       try {
-//         const result = await api<ApiEnvelope<{ user: User }>>('/api/auth/verify', {}, token)
-//         if (cancelled) return
-//         setUser(result.data.user)
-//         const list = await loadConversations(token)
-//         if (!cancelled && list.length && !activeId) setActiveId(list[0].id)
+//         await authenticate()
 //       } catch {
-//         if (refreshToken) {
-//           try {
-//             const refreshed = await api<ApiEnvelope<{ accessToken: string }>>('/api/auth/refresh', { method: 'POST' }, refreshToken)
-//             if (cancelled) return
-//             localStorage.setItem(TOKEN_KEY, refreshed.data.accessToken); setToken(refreshed.data.accessToken)
-//           } catch { if (!cancelled) signOut() }
-//         } else if (!cancelled) signOut()
+//         if (!cancelled) {
+//           setIsAuthenticated(false)
+//           setUser(null)
+//           setConversations([])
+//         }
+//       } finally {
+//         if (!cancelled) {
+//           setAuthLoading(false)
+//         }
 //       }
 //     }
-//     void boot()
-//     return () => { cancelled = true }
-//   // Boot once per token change; active conversation is intentionally not a dependency.
-//   // eslint-disable-next-line react-hooks/exhaustive-deps
-//   }, [token, loadConversations, refreshToken, signOut])
 
-//   const activeConversation = useMemo(() => conversations.find(c => c.id === activeId), [conversations, activeId])
+//     void boot()
+
+//     return () => {
+//       cancelled = true
+//     }
+//   }, [authenticate])
+
+//   // --------------------------------------------------
+//   // ACTIVE CONVERSATION
+//   // --------------------------------------------------
+
+//   const activeConversation = useMemo(
+//     () => conversations.find(c => c.id === activeId),
+//     [conversations, activeId]
+//   )
+
+//   // --------------------------------------------------
+//   // LOAD MESSAGES
+//   // --------------------------------------------------
 
 //   useEffect(() => {
-//     if (!token || !activeId) { setMessages([]); return }
-//     let cancelled = false
-//     async function loadMessages() {
-//       setLoading(true); setPageError('')
-//       try {
-//         const result = await api<ApiEnvelope<Message[]>>(`/api/conversation/${activeId}/messages?page=1&limit=100`, {}, token)
-//         if (!cancelled) setMessages((result.data || []).slice().reverse())
-//       } catch (err) { if (!cancelled) { setMessages([]); setPageError(err instanceof Error ? err.message : 'Could not load messages.') } }
-//       finally { if (!cancelled) setLoading(false) }
+//     if (!isAuthenticated || !activeId) {
+//       setMessages([])
+//       return
 //     }
-//     void loadMessages()
-//     return () => { cancelled = true }
-//   }, [token, activeId])
 
-//   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }) }, [messages, sending, loading])
+//     let cancelled = false
+
+//     async function loadMessages() {
+//       setLoading(true)
+//       setPageError('')
+
+//       try {
+//         const result = await api<ApiEnvelope<Message[]>>(
+//           `/api/conversation/${activeId}/messages?page=1&limit=100`
+//         )
+
+//         if (!cancelled) {
+//           setMessages((result.data || []).slice().reverse())
+//         }
+//       } catch (err) {
+//         if (!cancelled) {
+//           setMessages([])
+//           setPageError(
+//             err instanceof Error
+//               ? err.message
+//               : 'Could not load messages.'
+//           )
+//         }
+//       } finally {
+//         if (!cancelled) {
+//           setLoading(false)
+//         }
+//       }
+//     }
+
+//     void loadMessages()
+
+//     return () => {
+//       cancelled = true
+//     }
+//   }, [isAuthenticated, activeId])
+
+//   // --------------------------------------------------
+//   // AUTO SCROLL
+//   // --------------------------------------------------
+
+//   useEffect(() => {
+//     bottomRef.current?.scrollIntoView({
+//       behavior: 'smooth',
+//       block: 'end',
+//     })
+//   }, [messages, sending, loading])
+
+//   // --------------------------------------------------
+//   // CREATE CONVERSATION
+//   // --------------------------------------------------
 
 //   async function createConversation() {
-//     if (!token) return
+//     if (!isAuthenticated) return
+
 //     setPageError('')
+
 //     try {
-//       const result = await api<ApiEnvelope<Conversation>>('/api/conversation', { method: 'POST', body: JSON.stringify({ title: 'New conversation' }) }, token)
-//       setConversations(prev => [result.data, ...prev]); setActiveId(result.data.id); setMessages([]); setSidebarOpen(false); inputRef.current?.focus()
-//     } catch (err) { setPageError(err instanceof Error ? err.message : 'Could not create a conversation.') }
+//       const result = await api<ApiEnvelope<Conversation>>(
+//         '/api/conversation',
+//         {
+//           method: 'POST',
+//           body: JSON.stringify({
+//             title: 'New conversation',
+//           }),
+//         }
+//       )
+
+//       setConversations(prev => [result.data, ...prev])
+//       setActiveId(result.data.id)
+//       setMessages([])
+//       setSidebarOpen(false)
+
+//       inputRef.current?.focus()
+//     } catch (err) {
+//       setPageError(
+//         err instanceof Error
+//           ? err.message
+//           : 'Could not create a conversation.'
+//       )
+//     }
 //   }
+
+//   // --------------------------------------------------
+//   // SEND MESSAGE
+//   // --------------------------------------------------
 
 //   async function sendMessage(event?: FormEvent) {
 //     event?.preventDefault()
+
 //     const content = draft.trim()
-//     if (!content || sending || !token) return
-//     setDraft(''); setPageError(''); setSending(true)
+
+//     if (!content || sending || !isAuthenticated) return
+
+//     setDraft('')
+//     setPageError('')
+//     setSending(true)
+
 //     let conversationId = activeId
+
 //     try {
+//       // Create conversation if none is selected.
 //       if (!conversationId) {
-//         const created = await api<ApiEnvelope<Conversation>>('/api/conversation', { method: 'POST', body: JSON.stringify({ title: content.slice(0, 48) }) }, token)
+//         const created = await api<ApiEnvelope<Conversation>>(
+//           '/api/conversation',
+//           {
+//             method: 'POST',
+//             body: JSON.stringify({
+//               title: content.slice(0, 48),
+//             }),
+//           }
+//         )
+
 //         conversationId = created.data.id
-//         setConversations(prev => [created.data, ...prev]); setActiveId(conversationId)
-//       } else if (activeConversation?.title === 'New conversation' && messages.length === 0) {
+
+//         setConversations(prev => [created.data, ...prev])
+//         setActiveId(conversationId)
+//       } else if (
+//         activeConversation?.title === 'New conversation' &&
+//         messages.length === 0
+//       ) {
 //         const title = content.slice(0, 48)
-//         const updated = await api<ApiEnvelope<Conversation>>(`/api/conversation/${conversationId}`, { method: 'PUT', body: JSON.stringify({ title }) }, token)
-//         setConversations(prev => prev.map(c => c.id === conversationId ? updated.data : c))
+
+//         const updated = await api<ApiEnvelope<Conversation>>(
+//           `/api/conversation/${conversationId}`,
+//           {
+//             method: 'PUT',
+//             body: JSON.stringify({ title }),
+//           }
+//         )
+
+//         setConversations(prev =>
+//           prev.map(c =>
+//             c.id === conversationId ? updated.data : c
+//           )
+//         )
 //       }
-//       const optimistic: Message = { id: `pending-${Date.now()}`, conversationId, role: 'user', content, createdAt: new Date().toISOString() }
+
+//       // Optimistic user message.
+//       const optimistic: Message = {
+//         id: `pending-${Date.now()}`,
+//         conversationId,
+//         role: 'user',
+//         content,
+//         createdAt: new Date().toISOString(),
+//       }
+
 //       setMessages(prev => [...prev, optimistic])
-//       const result = await api<ApiEnvelope<{ userMessage: Message; assistantMessage: Message }>>(`/api/conversation/${conversationId}/messages`, { method: 'POST', body: JSON.stringify({ content }) }, token)
-//       setMessages(prev => [...prev.filter(m => !m.id.startsWith('pending-')), result.data.userMessage, result.data.assistantMessage])
-//       setConversations(prev => prev.map(c => c.id === conversationId ? { ...c, updatedAt: new Date().toISOString() } : c).sort((a, b) => +new Date(b.updatedAt) - +new Date(a.updatedAt)))
+
+//       const result = await api<
+//         ApiEnvelope<{
+//           userMessage: Message
+//           assistantMessage: Message
+//         }>
+//       >(
+//         `/api/conversation/${conversationId}/messages`,
+//         {
+//           method: 'POST',
+//           body: JSON.stringify({ content }),
+//         }
+//       )
+
+//       setMessages(prev => [
+//         ...prev.filter(m => !m.id.startsWith('pending-')),
+//         result.data.userMessage,
+//         result.data.assistantMessage,
+//       ])
+
+//       setConversations(prev =>
+//         prev
+//           .map(c =>
+//             c.id === conversationId
+//               ? {
+//                   ...c,
+//                   updatedAt: new Date().toISOString(),
+//                 }
+//               : c
+//           )
+//           .sort(
+//             (a, b) =>
+//               +new Date(b.updatedAt) - +new Date(a.updatedAt)
+//           )
+//       )
 //     } catch (err) {
-//       setMessages(prev => prev.filter(m => !m.id.startsWith('pending-')))
-//       setDraft(content); setPageError(err instanceof Error ? err.message : 'Message could not be sent.')
-//     } finally { setSending(false); inputRef.current?.focus() }
+//       setMessages(prev =>
+//         prev.filter(m => !m.id.startsWith('pending-'))
+//       )
+
+//       setDraft(content)
+
+//       setPageError(
+//         err instanceof Error
+//           ? err.message
+//           : 'Message could not be sent.'
+//       )
+//     } finally {
+//       setSending(false)
+//       inputRef.current?.focus()
+//     }
 //   }
 
-//   function handleComposerKey(event: KeyboardEvent<HTMLTextAreaElement>) {
-//     if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); void sendMessage() }
+//   // --------------------------------------------------
+//   // COMPOSER KEYBOARD
+//   // --------------------------------------------------
+
+//   function handleComposerKey(
+//     event: KeyboardEvent<HTMLTextAreaElement>
+//   ) {
+//     if (event.key === 'Enter' && !event.shiftKey) {
+//       event.preventDefault()
+//       void sendMessage()
+//     }
 //   }
+
+//   // --------------------------------------------------
+//   // DELETE CONVERSATION
+//   // --------------------------------------------------
 
 //   async function deleteConversation(id: string) {
-//     if (!token) return
+//     if (!isAuthenticated) return
+
 //     try {
-//       await api(`/api/conversation/${id}`, { method: 'DELETE' }, token)
+//       await api(`/api/conversation/${id}`, {
+//         method: 'DELETE',
+//       })
+
 //       const remaining = conversations.filter(c => c.id !== id)
-//       setConversations(remaining); setMenuId('')
-//       if (activeId === id) { setActiveId(remaining[0]?.id || ''); setMessages([]) }
-//     } catch (err) { setPageError(err instanceof Error ? err.message : 'Could not delete conversation.') }
+
+//       setConversations(remaining)
+//       setMenuId('')
+
+//       if (activeId === id) {
+//         setActiveId(remaining[0]?.id || '')
+//         setMessages([])
+//       }
+//     } catch (err) {
+//       setPageError(
+//         err instanceof Error
+//           ? err.message
+//           : 'Could not delete conversation.'
+//       )
+//     }
 //   }
+
+//   // --------------------------------------------------
+//   // RENAME CONVERSATION
+//   // --------------------------------------------------
 
 //   async function renameConversation(id: string) {
 //     const title = renameValue.trim()
-//     if (title.length < 2 || !token) return
+
+//     if (title.length < 2 || !isAuthenticated) return
+
 //     try {
-//       const result = await api<ApiEnvelope<Conversation>>(`/api/conversation/${id}`, { method: 'PUT', body: JSON.stringify({ title }) }, token)
-//       setConversations(prev => prev.map(c => c.id === id ? result.data : c)); setRenamingId(''); setMenuId('')
-//     } catch (err) { setPageError(err instanceof Error ? err.message : 'Could not rename conversation.') }
+//       const result = await api<ApiEnvelope<Conversation>>(
+//         `/api/conversation/${id}`,
+//         {
+//           method: 'PUT',
+//           body: JSON.stringify({ title }),
+//         }
+//       )
+
+//       setConversations(prev =>
+//         prev.map(c => c.id === id ? result.data : c)
+//       )
+
+//       setRenamingId('')
+//       setMenuId('')
+//     } catch (err) {
+//       setPageError(
+//         err instanceof Error
+//           ? err.message
+//           : 'Could not rename conversation.'
+//       )
+//     }
 //   }
 
-//   const filteredConversations = conversations.filter(c => c.title.toLowerCase().includes(search.toLowerCase()))
+//   // --------------------------------------------------
+//   // FILTER CONVERSATIONS
+//   // --------------------------------------------------
 
-//   if (!token || !user) return <AuthScreen onAuthenticated={authenticate} />
+//   const filteredConversations = conversations.filter(c =>
+//     c.title.toLowerCase().includes(search.toLowerCase())
+//   )
 
-//   return <main className={`app-shell ${dark ? 'theme-dark' : 'theme-light'}`}>
-//     {sidebarOpen && <button className="mobile-scrim" aria-label="Close sidebar" onClick={() => setSidebarOpen(false)} />}
-//     <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-//       <div className="sidebar-top"><a className="brand" href="#home"><span className="brand-mark"><Icon name="sparkle" size={20} /></span><span>chat<span className="brand-light">.ai</span></span></a><button className="icon-button sidebar-collapse" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar"><Icon name="menu" /></button></div>
-//       <button className="new-chat-button" onClick={() => void createConversation()}><Icon name="plus" size={18} /><span>New chat</span></button>
-//       <label className="search-box"><Icon name="search" size={16} /><input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search conversations" /></label>
-//       <div className="side-section-label">YOUR SPACE <span>{conversations.length}</span></div>
-//       <div className="conversation-list">
-//         {filteredConversations.map(conversation => <div key={conversation.id} className={`conversation-row ${activeId === conversation.id ? 'selected' : ''}`}>
-//           {renamingId === conversation.id ? <form className="rename-form" onSubmit={e => { e.preventDefault(); void renameConversation(conversation.id) }}><input autoFocus value={renameValue} onChange={e => setRenameValue(e.target.value)} onKeyDown={e => { if (e.key === 'Escape') setRenamingId('') }} /><button type="submit">Save</button></form> : <><button className="conversation-select" onClick={() => { setActiveId(conversation.id); setSidebarOpen(false) }}><Icon name="message" size={16} /><span>{conversation.title}</span></button><button className="conversation-more" aria-label="Conversation actions" onClick={() => setMenuId(menuId === conversation.id ? '' : conversation.id)}>···</button>{menuId === conversation.id && <div className="conversation-menu"><button onClick={() => { setRenameValue(conversation.title); setRenamingId(conversation.id); setMenuId('') }}><Icon name="edit" size={14} /> Rename</button><button className="danger-action" onClick={() => void deleteConversation(conversation.id)}><Icon name="trash" size={14} /> Delete</button></div>}</>}
-//         </div>)}
-//         {!filteredConversations.length && <p className="empty-search">{search ? 'No matching conversations' : 'Your conversations will appear here.'}</p>}
-//       </div>
-//       <div className="sidebar-bottom"><div className="upgrade-card"><div className="upgrade-icon"><Icon name="sparkle" size={18} /></div><strong>A little more magic</strong><p>Your ideas deserve room to grow.</p><button onClick={() => setPageError('You are already using the Nova AI workspace.')}>Explore Nova <span>↗</span></button></div><div className="profile-row"><div className="profile-avatar">{user.id.slice(0, 1).toUpperCase()}</div><div className="profile-info"><strong>Your account</strong><span>Personal workspace</span></div><button className="icon-button" onClick={() => void signOut()} title="Sign out" aria-label="Sign out"><Icon name="logout" size={17} /></button></div></div>
-//     </aside>
-//     <section className="chat-panel">
-//       <header className="chat-header"><div className="chat-header-left"><button className="icon-button mobile-menu" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar"><Icon name="menu" /></button><div className="model-badge"><span className="model-dot"><Icon name="sparkle" size={15} /></span><span>Nova Assistant</span><span className="model-pill">AI</span></div></div><div className="header-actions"><span className="secure-indicator"><i /> Private session</span><button className="icon-button theme-toggle" title="Toggle theme" aria-label="Toggle theme" onClick={() => setDark(!dark)}><Icon name="sun" size={18} /></button><button className="header-avatar" title="Account" onClick={() => void signOut()}>{user.id.slice(0, 1).toUpperCase()}</button></div></header>
-//       <div className={`chat-content ${messages.length ? 'has-messages' : ''}`}>
-//         {messages.length === 0 && !loading ? <div className="welcome-screen"><div className="welcome-symbol"><span className="welcome-ring ring-one" /><span className="welcome-ring ring-two" /><span className="welcome-center"><Icon name="sparkle" size={30} /></span><span className="welcome-twinkle twinkle-one">✦</span><span className="welcome-twinkle twinkle-two">✧</span></div><p className="welcome-overline">A LITTLE CURIOSITY GOES A LONG WAY</p><h1>What’s on your <span>mind?</span></h1><p className="welcome-description">A question, a challenge, a half-formed idea.<br />Let’s figure it out together.</p><div className="suggestion-grid"><button onClick={() => setDraft('Explain a complex idea in a simple way')}><span className="suggestion-icon lavender">✳</span><span><strong>Make it make sense</strong><small>Explain something complex</small></span><span className="suggestion-arrow">↗</span></button><button onClick={() => setDraft('Help me brainstorm creative ideas for a project')}><span className="suggestion-icon peach">✦</span><span><strong>Think outside the box</strong><small>Brainstorm fresh ideas</small></span><span className="suggestion-arrow">↗</span></button><button onClick={() => setDraft('Help me write a clear, compelling piece of text')}><span className="suggestion-icon mint">✎</span><span><strong>Find the right words</strong><small>Write, rewrite, refine</small></span><span className="suggestion-arrow">↗</span></button><button onClick={() => setDraft('Help me plan my next project step by step')}><span className="suggestion-icon blue">⌁</span><span><strong>Turn plans into action</strong><small>Map out your next steps</small></span><span className="suggestion-arrow">↗</span></button></div></div> : <div className="message-thread">
-//           {loading && messages.length === 0 && <div className="loading-line"><span className="spinner" /> Loading conversation…</div>}
-//           {messages.map(message => <article key={message.id} className={`message ${message.role === 'user' ? 'user-message' : 'assistant-message'}`}><div className={`message-avatar ${message.role === 'assistant' ? 'ai-avatar' : ''}`}>{message.role === 'assistant' ? <Icon name="sparkle" size={16} /> : user.id.slice(0, 1).toUpperCase()}</div><div className="message-body"><div className="message-author">{message.role === 'assistant' ? 'Nova' : 'You'} <span>{new Date(message.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span></div><div className="message-text">{message.content}</div></div></article>)}
-//           {sending && <article className="message assistant-message"><div className="message-avatar ai-avatar"><Icon name="sparkle" size={16} /></div><div className="message-body"><div className="message-author">Nova <span>thinking</span></div><div className="typing-indicator"><i /><i /><i /></div></div></article>}
-//           <div ref={bottomRef} />
-//         </div>}
-//       </div>
-//       {pageError && <div className="page-error" role="alert"><span>{pageError}</span><button onClick={() => setPageError('')} aria-label="Dismiss error"><Icon name="close" size={15} /></button></div>}
-//       <div className="composer-wrap"><form className="composer" onSubmit={sendMessage}><textarea ref={inputRef} rows={1} value={draft} onChange={e => setDraft(e.target.value)} onKeyDown={handleComposerKey} placeholder="Ask anything…" aria-label="Message Nova" /><div className="composer-bottom"><div className="composer-tools"><span className="composer-hint"><kbd>↵</kbd> to send <span>·</span> <kbd>shift + ↵</kbd> for a new line</span></div><button className="send-button" type="submit" disabled={!draft.trim() || sending} aria-label="Send message"><Icon name="send" size={17} /></button></div></form><p className="disclaimer">Nova can make mistakes. Check important information.</p></div>
-//     </section>
-//   </main>
+//   // --------------------------------------------------
+//   // AUTH LOADING
+//   // --------------------------------------------------
+
+//   if (authLoading) {
+//     return (
+//       <main className="auth-page">
+//         <div className="loading-line">
+//           <span className="spinner" />
+//           Checking your session...
+//         </div>
+//       </main>
+//     )
+//   }
+
+//   // --------------------------------------------------
+//   // AUTH SCREEN
+//   // --------------------------------------------------
+
+//   if (!isAuthenticated || !user) {
+//     return <AuthScreen onAuthenticated={authenticate} />
+//   }
+
+//   // --------------------------------------------------
+//   // CHAT APPLICATION
+//   // --------------------------------------------------
+
+//   return (
+//     <main className={`app-shell ${dark ? 'theme-dark' : 'theme-light'}`}>
+
+//       {sidebarOpen && (
+//         <button
+//           className="mobile-scrim"
+//           aria-label="Close sidebar"
+//           onClick={() => setSidebarOpen(false)}
+//         />
+//       )}
+
+//       {/* SIDEBAR */}
+
+//       <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
+
+//         <div className="sidebar-top">
+//           <a className="brand" href="#home">
+//             <span className="brand-mark">
+//               <Icon name="sparkle" size={20} />
+//             </span>
+//             <span>
+//               chat<span className="brand-light">.ai</span>
+//             </span>
+//           </a>
+
+//           <button
+//             className="icon-button sidebar-collapse"
+//             onClick={() => setSidebarOpen(false)}
+//             aria-label="Close sidebar"
+//           >
+//             <Icon name="menu" />
+//           </button>
+//         </div>
+
+//         <button
+//           className="new-chat-button"
+//           onClick={() => void createConversation()}
+//         >
+//           <Icon name="plus" size={18} />
+//           <span>New chat</span>
+//         </button>
+
+//         <label className="search-box">
+//           <Icon name="search" size={16} />
+//           <input
+//             value={search}
+//             onChange={e => setSearch(e.target.value)}
+//             placeholder="Search conversations"
+//           />
+//         </label>
+
+//         <div className="side-section-label">
+//           YOUR SPACE <span>{conversations.length}</span>
+//         </div>
+
+//         <div className="conversation-list">
+
+//           {filteredConversations.map(conversation => (
+//             <div
+//               key={conversation.id}
+//               className={`conversation-row ${
+//                 activeId === conversation.id ? 'selected' : ''
+//               }`}
+//             >
+//               {renamingId === conversation.id ? (
+//                 <form
+//                   className="rename-form"
+//                   onSubmit={e => {
+//                     e.preventDefault()
+//                     void renameConversation(conversation.id)
+//                   }}
+//                 >
+//                   <input
+//                     autoFocus
+//                     value={renameValue}
+//                     onChange={e => setRenameValue(e.target.value)}
+//                     onKeyDown={e => {
+//                       if (e.key === 'Escape') setRenamingId('')
+//                     }}
+//                   />
+
+//                   <button type="submit">Save</button>
+//                 </form>
+//               ) : (
+//                 <>
+//                   <button
+//                     className="conversation-select"
+//                     onClick={() => {
+//                       setActiveId(conversation.id)
+//                       setSidebarOpen(false)
+//                     }}
+//                   >
+//                     <Icon name="message" size={16} />
+//                     <span>{conversation.title}</span>
+//                   </button>
+
+//                   <button
+//                     className="conversation-more"
+//                     aria-label="Conversation actions"
+//                     onClick={() =>
+//                       setMenuId(
+//                         menuId === conversation.id
+//                           ? ''
+//                           : conversation.id
+//                       )
+//                     }
+//                   >
+//                     ···
+//                   </button>
+
+//                   {menuId === conversation.id && (
+//                     <div className="conversation-menu">
+//                       <button
+//                         onClick={() => {
+//                           setRenameValue(conversation.title)
+//                           setRenamingId(conversation.id)
+//                           setMenuId('')
+//                         }}
+//                       >
+//                         <Icon name="edit" size={14} />
+//                         Rename
+//                       </button>
+
+//                       <button
+//                         className="danger-action"
+//                         onClick={() =>
+//                           void deleteConversation(conversation.id)
+//                         }
+//                       >
+//                         <Icon name="trash" size={14} />
+//                         Delete
+//                       </button>
+//                     </div>
+//                   )}
+//                 </>
+//               )}
+//             </div>
+//           ))}
+
+//           {!filteredConversations.length && (
+//             <p className="empty-search">
+//               {search
+//                 ? 'No matching conversations'
+//                 : 'Your conversations will appear here.'}
+//             </p>
+//           )}
+//         </div>
+
+//         {/* SIDEBAR BOTTOM */}
+
+//         <div className="sidebar-bottom">
+
+//           <div className="upgrade-card">
+//             <div className="upgrade-icon">
+//               <Icon name="sparkle" size={18} />
+//             </div>
+
+//             <strong>A little more magic</strong>
+
+//             <p>Your ideas deserve room to grow.</p>
+
+//             <button
+//               onClick={() =>
+//                 setPageError(
+//                   'You are already using the Nova AI workspace.'
+//                 )
+//               }
+//             >
+//               Explore Nova <span>↗</span>
+//             </button>
+//           </div>
+
+//           <div className="profile-row">
+//             <div className="profile-avatar">
+//               {user.id.slice(0, 1).toUpperCase()}
+//             </div>
+
+//             <div className="profile-info">
+//               <strong>Your account</strong>
+//               <span>Personal workspace</span>
+//             </div>
+
+//             <button
+//               className="icon-button"
+//               onClick={() => void signOut()}
+//               title="Sign out"
+//               aria-label="Sign out"
+//             >
+//               <Icon name="logout" size={17} />
+//             </button>
+//           </div>
+//         </div>
+//       </aside>
+
+//       {/* CHAT PANEL */}
+
+//       <section className="chat-panel">
+
+//         <header className="chat-header">
+
+//           <div className="chat-header-left">
+//             <button
+//               className="icon-button mobile-menu"
+//               onClick={() => setSidebarOpen(true)}
+//               aria-label="Open sidebar"
+//             >
+//               <Icon name="menu" />
+//             </button>
+
+//             <div className="model-badge">
+//               <span className="model-dot">
+//                 <Icon name="sparkle" size={15} />
+//               </span>
+
+//               <span>Nova Assistant</span>
+//               <span className="model-pill">AI</span>
+//             </div>
+//           </div>
+
+//           <div className="header-actions">
+//             <span className="secure-indicator">
+//               <i /> Private session
+//             </span>
+
+//             <button
+//               className="icon-button theme-toggle"
+//               title="Toggle theme"
+//               aria-label="Toggle theme"
+//               onClick={() => setDark(!dark)}
+//             >
+//               <Icon name="sun" size={18} />
+//             </button>
+
+//             <button
+//               className="header-avatar"
+//               title="Account"
+//               onClick={() => void signOut()}
+//             >
+//               {user.id.slice(0, 1).toUpperCase()}
+//             </button>
+//           </div>
+//         </header>
+
+//         {/* CHAT CONTENT */}
+
+//         <div
+//           className={`chat-content ${
+//             messages.length ? 'has-messages' : ''
+//           }`}
+//         >
+//           {messages.length === 0 && !loading ? (
+//             <div className="welcome-screen">
+
+//               <div className="welcome-symbol">
+//                 <span className="welcome-ring ring-one" />
+//                 <span className="welcome-ring ring-two" />
+
+//                 <span className="welcome-center">
+//                   <Icon name="sparkle" size={30} />
+//                 </span>
+
+//                 <span className="welcome-twinkle twinkle-one">✦</span>
+//                 <span className="welcome-twinkle twinkle-two">✧</span>
+//               </div>
+
+//               <p className="welcome-overline">
+//                 A LITTLE CURIOSITY GOES A LONG WAY
+//               </p>
+
+//               <h1>
+//                 What’s on your <span>mind?</span>
+//               </h1>
+
+//               <p className="welcome-description">
+//                 A question, a challenge, a half-formed idea.<br />
+//                 Let’s figure it out together.
+//               </p>
+
+//               <div className="suggestion-grid">
+
+//                 <button
+//                   onClick={() =>
+//                     setDraft(
+//                       'Explain a complex idea in a simple way'
+//                     )
+//                   }
+//                 >
+//                   <span className="suggestion-icon lavender">✳</span>
+//                   <span>
+//                     <strong>Make it make sense</strong>
+//                     <small>Explain something complex</small>
+//                   </span>
+//                   <span className="suggestion-arrow">↗</span>
+//                 </button>
+
+//                 <button
+//                   onClick={() =>
+//                     setDraft(
+//                       'Help me brainstorm creative ideas for a project'
+//                     )
+//                   }
+//                 >
+//                   <span className="suggestion-icon peach">✦</span>
+//                   <span>
+//                     <strong>Think outside the box</strong>
+//                     <small>Brainstorm fresh ideas</small>
+//                   </span>
+//                   <span className="suggestion-arrow">↗</span>
+//                 </button>
+
+//                 <button
+//                   onClick={() =>
+//                     setDraft(
+//                       'Help me write a clear, compelling piece of text'
+//                     )
+//                   }
+//                 >
+//                   <span className="suggestion-icon mint">✎</span>
+//                   <span>
+//                     <strong>Find the right words</strong>
+//                     <small>Write, rewrite, refine</small>
+//                   </span>
+//                   <span className="suggestion-arrow">↗</span>
+//                 </button>
+
+//                 <button
+//                   onClick={() =>
+//                     setDraft(
+//                       'Help me plan my next project step by step'
+//                     )
+//                   }
+//                 >
+//                   <span className="suggestion-icon blue">⌁</span>
+//                   <span>
+//                     <strong>Turn plans into action</strong>
+//                     <small>Map out your next steps</small>
+//                   </span>
+//                   <span className="suggestion-arrow">↗</span>
+//                 </button>
+
+//               </div>
+//             </div>
+//           ) : (
+//             <div className="message-thread">
+
+//               {loading && messages.length === 0 && (
+//                 <div className="loading-line">
+//                   <span className="spinner" />
+//                   Loading conversation…
+//                 </div>
+//               )}
+
+//               {messages.map(message => (
+//                 <article
+//                   key={message.id}
+//                   className={`message ${
+//                     message.role === 'user'
+//                       ? 'user-message'
+//                       : 'assistant-message'
+//                   }`}
+//                 >
+//                   <div
+//                     className={`message-avatar ${
+//                       message.role === 'assistant'
+//                         ? 'ai-avatar'
+//                         : ''
+//                     }`}
+//                   >
+//                     {message.role === 'assistant'
+//                       ? <Icon name="sparkle" size={16} />
+//                       : user.id.slice(0, 1).toUpperCase()}
+//                   </div>
+
+//                   <div className="message-body">
+//                     <div className="message-author">
+//                       {message.role === 'assistant' ? 'Nova' : 'You'}
+
+//                       <span>
+//                         {new Date(message.createdAt).toLocaleTimeString(
+//                           [],
+//                           {
+//                             hour: '2-digit',
+//                             minute: '2-digit',
+//                           }
+//                         )}
+//                       </span>
+//                     </div>
+
+//                     <div className="message-text">
+//                       {message.content}
+//                     </div>
+//                   </div>
+//                 </article>
+//               ))}
+
+//               {sending && (
+//                 <article className="message assistant-message">
+//                   <div className="message-avatar ai-avatar">
+//                     <Icon name="sparkle" size={16} />
+//                   </div>
+
+//                   <div className="message-body">
+//                     <div className="message-author">
+//                       Nova <span>thinking</span>
+//                     </div>
+
+//                     <div className="typing-indicator">
+//                       <i /><i /><i />
+//                     </div>
+//                   </div>
+//                 </article>
+//               )}
+
+//               <div ref={bottomRef} />
+//             </div>
+//           )}
+//         </div>
+
+//         {/* ERROR */}
+
+//         {pageError && (
+//           <div className="page-error" role="alert">
+//             <span>{pageError}</span>
+
+//             <button
+//               onClick={() => setPageError('')}
+//               aria-label="Dismiss error"
+//             >
+//               <Icon name="close" size={15} />
+//             </button>
+//           </div>
+//         )}
+
+//         {/* COMPOSER */}
+
+//         <div className="composer-wrap">
+//           <form
+//             className="composer"
+//             onSubmit={sendMessage}
+//           >
+//             <textarea
+//               ref={inputRef}
+//               rows={1}
+//               value={draft}
+//               onChange={e => setDraft(e.target.value)}
+//               onKeyDown={handleComposerKey}
+//               placeholder="Ask anything…"
+//               aria-label="Message Nova"
+//             />
+
+//             <div className="composer-bottom">
+//               <div className="composer-tools">
+//                 <span className="composer-hint">
+//                   <kbd>↵</kbd> to send
+//                   <span>·</span>
+//                   <kbd>shift + ↵</kbd> for a new line
+//                 </span>
+//               </div>
+
+//               <button
+//                 className="send-button"
+//                 type="submit"
+//                 disabled={!draft.trim() || sending}
+//                 aria-label="Send message"
+//               >
+//                 <Icon name="send" size={17} />
+//               </button>
+//             </div>
+//           </form>
+
+//           <p className="disclaimer">
+//             Nova can make mistakes. Check important information.
+//           </p>
+//         </div>
+//       </section>
+//     </main>
+//   )
 // }
 
 // export default App
@@ -314,8 +1362,30 @@ const API_URL = (
 ).replace(/\/$/, '')
 
 // --------------------------------------------------
-// API CLIENT
+// API CLIENT + AUTOMATIC TOKEN REFRESH
 // --------------------------------------------------
+
+let refreshPromise: Promise<boolean> | null = null
+
+async function refreshSession(): Promise<boolean> {
+  if (!refreshPromise) {
+    refreshPromise = (async () => {
+      try {
+        const response = await fetch(`${API_URL}/api/auth/refresh`, {
+          method: 'POST',
+          credentials: 'include',
+        })
+        return response.ok
+      } catch {
+        return false
+      }
+    })().finally(() => {
+      refreshPromise = null
+    })
+  }
+
+  return refreshPromise
+}
 
 async function api<T>(
   path: string,
@@ -327,18 +1397,35 @@ async function api<T>(
     headers.set('Content-Type', 'application/json')
   }
 
-  let response: Response
+  const sendRequest = async (): Promise<Response> => {
+    try {
+      return await fetch(`${API_URL}${path}`, {
+        ...options,
+        headers,
+        credentials: 'include',
+      })
+    } catch {
+      throw new Error(
+        `Cannot connect to the API at ${API_URL}. Make sure the backend is running.`
+      )
+    }
+  }
 
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      ...options,
-      headers,
-      credentials: 'include',
-    })
-  } catch {
-    throw new Error(
-      `Cannot connect to the API at ${API_URL}. Make sure the backend is running.`
-    )
+  let response = await sendRequest()
+
+  const excludedPaths = [
+    '/api/auth/signin',
+    '/api/auth/signup',
+    '/api/auth/refresh',
+    '/api/auth/signout',
+    '/api/auth/verify',
+  ]
+
+  if (response.status === 401 && !excludedPaths.includes(path)) {
+    const refreshed = await refreshSession()
+    if (refreshed) {
+      response = await sendRequest()
+    }
   }
 
   const payload = await response
@@ -372,25 +1459,15 @@ function Icon({
 }) {
   const paths: Record<string, ReactNode> = {
     plus: <><path d="M12 5v14M5 12h14" /></>,
-
     search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-4-4" /></>,
-
     message: <><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8z" /></>,
-
     send: <><path d="m22 2-7 20-4-9-9-4Z" /><path d="M22 2 11 13" /></>,
-
     trash: <><path d="M3 6h18M8 6V4h8v2m3 0-1 14H6L5 6m4 4v6m6-6v6" /></>,
-
     edit: <><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z" /></>,
-
     logout: <><path d="M10 17l5-5-5-5M15 12H3" /><path d="M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" /></>,
-
     menu: <><path d="M4 6h16M4 12h16M4 18h16" /></>,
-
     sparkle: <><path d="m12 3 1.9 5.8L20 11l-6.1 2.2L12 19l-2-5.8L4 11l6-2.2Z" /><path d="m19 14 1.2 2.8L23 18l-2.8 1.1L19 22l-1.1-2.9L15 18l2.9-1.2Z" /></>,
-
     close: <><path d="m18 6-12 12M6 6l12 12" /></>,
-
     sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" /></>,
   }
 
@@ -421,232 +1498,139 @@ function AuthScreen({
   onAuthenticated: () => Promise<void>
 }) {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin')
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [busy, setBusy] = useState(false)
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  async function submit(event: FormEvent) {
-    event.preventDefault()
+  const isSignup = mode === 'signup'
 
-    setBusy(true)
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     setError('')
 
+    if (isSignup && password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
     try {
-      await api(`/api/auth/${mode}`, {
-        method: 'POST',
-        body: JSON.stringify(
-          mode === 'signup'
-            ? {
-                name: name.trim(),
-                email: email.trim(),
-                password,
-              }
-            : {
-                email: email.trim(),
-                password,
-              }
-        ),
-      })
+      setLoading(true)
+
+      await api<ApiEnvelope<User>>(
+        isSignup ? '/api/auth/signup' : '/api/auth/signin',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      )
 
       await onAuthenticated()
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : 'Something went wrong.'
+        err instanceof Error ? err.message : 'Something went wrong.'
       )
     } finally {
-      setBusy(false)
+      setLoading(false)
     }
   }
 
   return (
-    <main className="auth-page">
-      <div className="auth-glow glow-one" />
-      <div className="auth-glow glow-two" />
-
-      <header className="auth-top">
-        <a className="brand" href="#home">
-          <span className="brand-mark">
-            <Icon name="sparkle" size={21} />
-          </span>
-          <span>
-            nova<span className="brand-light">.ai</span>
-          </span>
-        </a>
-
-        <span className="top-note">A clearer way to think.</span>
-      </header>
-
-      <section className="auth-layout">
-        <div className="auth-story">
-          <div className="eyebrow">
-            <span className="eyebrow-dot" /> YOUR AI WORKSPACE
+    <div className="auth-page">
+      <div className="auth-card">
+        <div className="auth-brand">
+          <div className="brand-icon">
+            <Icon name="sparkle" size={25} />
           </div>
+          <h1>Nova AI</h1>
+          <p>Your intelligent assistant</p>
+        </div>
 
-          <h1>
-            Ideas become<br />
-            <span>something more.</span>
-          </h1>
-
+        <div className="auth-heading">
+          <h2>{isSignup ? 'Create your account' : 'Welcome back'}</h2>
           <p>
-            Meet your thoughtful AI companion. Explore ideas, solve problems,
-            and bring your next big thing to life.
+            {isSignup
+              ? 'Sign up to start chatting with Nova.'
+              : 'Sign in to continue your conversations.'}
           </p>
-
-          <div className="story-orbit">
-            <div className="orbit orbit-a" />
-            <div className="orbit orbit-b" />
-
-            <div className="orbit-core">
-              <Icon name="sparkle" size={35} />
-            </div>
-
-            <span className="orbit-star star-a">✳</span>
-            <span className="orbit-star star-b">✦</span>
-            <span className="orbit-star star-c">✧</span>
-          </div>
-
-          <div className="story-foot">
-            <span className="avatar-stack">
-              <i>R</i>
-              <i>M</i>
-              <i>A</i>
-            </span>
-
-            <span>Made for curious minds</span>
-            <span className="tiny-separator">·</span>
-            <span>Powered by AI</span>
-          </div>
         </div>
 
-        <div className="auth-card">
-          <div className="auth-card-heading">
-            <span className="mini-icon">
-              <Icon name="sparkle" size={19} />
-            </span>
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label htmlFor="email">Email address</label>
+          <input
+            id="email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            autoComplete="email"
+            required
+          />
 
-            <div>
-              <h2>
-                {mode === 'signin'
-                  ? 'Welcome back'
-                  : 'Create your account'}
-              </h2>
+          <label htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Enter your password"
+            autoComplete={isSignup ? 'new-password' : 'current-password'}
+            required
+          />
 
-              <p>
-                {mode === 'signin'
-                  ? 'Pick up where your curiosity left off.'
-                  : 'Your next great idea starts here.'}
-              </p>
-            </div>
-          </div>
-
-          <div className="auth-tabs">
-            <button
-              className={mode === 'signin' ? 'active' : ''}
-              onClick={() => {
-                setMode('signin')
-                setError('')
-              }}
-            >
-              Sign in
-            </button>
-
-            <button
-              className={mode === 'signup' ? 'active' : ''}
-              onClick={() => {
-                setMode('signup')
-                setError('')
-              }}
-            >
-              Create account
-            </button>
-          </div>
-
-          <form onSubmit={submit} className="auth-form">
-            {mode === 'signup' && (
-              <label>
-                Full name
-
-                <input
-                  autoComplete="name"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  placeholder="Your name"
-                  minLength={3}
-                  maxLength={30}
-                  required
-                />
-              </label>
-            )}
-
-            <label>
-              Email address
-
+          {isSignup && (
+            <>
+              <label htmlFor="confirm-password">Confirm password</label>
               <input
-                type="email"
-                autoComplete="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                required
-              />
-            </label>
-
-            <label>
-              Password
-
-              <input
+                id="confirm-password"
                 type="password"
-                autoComplete={
-                  mode === 'signin'
-                    ? 'current-password'
-                    : 'new-password'
-                }
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="At least 8 characters"
-                minLength={8}
+                value={confirmPassword}
+                onChange={(event) => setConfirmPassword(event.target.value)}
+                placeholder="Confirm your password"
+                autoComplete="new-password"
                 required
               />
-            </label>
+            </>
+          )}
 
-            {error && (
-              <div className="error-message" role="alert">
-                {error}
-              </div>
-            )}
+          {error && <div className="auth-error">{error}</div>}
 
-            <button
-              className="primary-button auth-submit"
-              disabled={busy}
-            >
-              {busy
-                ? <span className="spinner" />
-                : mode === 'signin'
-                  ? 'Sign in to Nova'
-                  : 'Create account'}
+          <button type="submit" disabled={loading}>
+            {loading
+              ? 'Please wait...'
+              : isSignup
+                ? 'Create account'
+                : 'Sign in'}
+          </button>
+        </form>
 
-              <span>↗</span>
-            </button>
-          </form>
-
-          <p className="auth-terms">
-            By continuing, you agree to our <a href="#terms">Terms</a> and{' '}
-            <a href="#privacy">Privacy Policy</a>.
-          </p>
+        <div className="auth-switch">
+          {isSignup ? 'Already have an account?' : "Don't have an account?"}
+          <button
+            type="button"
+            onClick={() => {
+              setMode(isSignup ? 'signin' : 'signup')
+              setError('')
+            }}
+          >
+            {isSignup ? 'Sign in' : 'Sign up'}
+          </button>
         </div>
-      </section>
-
-      <footer className="auth-footer">
-        <span>© 2026 Nova AI</span>
-        <span><i /> All systems operational</span>
-        <span>Built for what’s next</span>
-      </footer>
-    </main>
+      </div>
+    </div>
   )
+}
+
+// --------------------------------------------------
+// MESSAGE CONTENT
+// --------------------------------------------------
+
+function MessageContent({ content }: { content: string }) {
+  return <div className="message-content">{content}</div>
 }
 
 // --------------------------------------------------
@@ -654,39 +1638,57 @@ function AuthScreen({
 // --------------------------------------------------
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [authLoading, setAuthLoading] = useState(true)
-
   const [user, setUser] = useState<User | null>(null)
-  const [conversations, setConversations] = useState<Conversation[]>([])
-  const [activeId, setActiveId] = useState('')
-  const [messages, setMessages] = useState<Message[]>([])
-  const [draft, setDraft] = useState('')
-  const [search, setSearch] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [sending, setSending] = useState(false)
-  const [pageError, setPageError] = useState('')
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [menuId, setMenuId] = useState('')
-  const [renamingId, setRenamingId] = useState('')
-  const [renameValue, setRenameValue] = useState('')
-  const [dark, setDark] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isInitializing, setIsInitializing] = useState(true)
 
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [conversations, setConversations] = useState<Conversation[]>([])
+  const [activeConversationId, setActiveConversationId] = useState<string | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+
+  const [input, setInput] = useState('')
+  const [isSending, setIsSending] = useState(false)
+  const [isLoadingMessages, setIsLoadingMessages] = useState(false)
+
+  const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [editingConversationId, setEditingConversationId] = useState<string | null>(null)
+  const [editingTitle, setEditingTitle] = useState('')
+  const [error, setError] = useState('')
+  const [darkMode, setDarkMode] = useState(true)
+
+  const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null)
+
+  const activeConversation = useMemo(
+    () =>
+      conversations.find(
+        (conversation) => conversation.id === activeConversationId
+      ) || null,
+    [conversations, activeConversationId]
+  )
+
+  const filteredConversations = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase()
+
+    if (!query) return conversations
+
+    return conversations.filter((conversation) =>
+      conversation.title.toLowerCase().includes(query)
+    )
+  }, [conversations, searchQuery])
 
   // --------------------------------------------------
   // LOAD CONVERSATIONS
   // --------------------------------------------------
 
   const loadConversations = useCallback(async () => {
-    const result = await api<ApiEnvelope<Conversation[]>>(
-      '/api/conversation?page=1&limit=100'
+    const response = await api<ApiEnvelope<Conversation[]>>(
+      '/api/conversation'
     )
 
-    setConversations(result.data || [])
-
-    return result.data || []
+    setConversations(response.data || [])
   }, [])
 
   // --------------------------------------------------
@@ -694,180 +1696,107 @@ function App() {
   // --------------------------------------------------
 
   const authenticate = useCallback(async () => {
-    // 1. Verify access cookie.
+    let authenticatedUser: User | null = null
+
     try {
-      const result = await api<ApiEnvelope<{ user: User }>>(
+      const response = await api<ApiEnvelope<User>>(
         '/api/auth/verify'
       )
 
-      setUser(result.data.user)
-      setIsAuthenticated(true)
-
-      const list = await loadConversations()
-
-      if (list.length > 0) {
-        setActiveId(list[0].id)
-      } else {
-        setActiveId('')
-      }
-
-      return
+      authenticatedUser = response.data
     } catch {
-      // Access cookie may be expired.
+      const refreshed = await refreshSession()
+
+      if (refreshed) {
+        try {
+          const response = await api<ApiEnvelope<User>>(
+            '/api/auth/verify'
+          )
+
+          authenticatedUser = response.data
+        } catch {
+          authenticatedUser = null
+        }
+      }
     }
 
-    // 2. Try refreshing using the refresh cookie.
-    await api('/api/auth/refresh', {
-      method: 'POST',
-    })
+    if (!authenticatedUser) {
+      setUser(null)
+      setIsAuthenticated(false)
+      setConversations([])
+      setMessages([])
+      setActiveConversationId(null)
+      return
+    }
 
-    // 3. Verify again with the new access cookie.
-    const result = await api<ApiEnvelope<{ user: User }>>(
-      '/api/auth/verify'
-    )
-
-    setUser(result.data.user)
+    setUser(authenticatedUser)
     setIsAuthenticated(true)
 
-    const list = await loadConversations()
-
-    if (list.length > 0) {
-      setActiveId(list[0].id)
-    } else {
-      setActiveId('')
+    try {
+      await loadConversations()
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : 'Could not load conversations.'
+      )
     }
   }, [loadConversations])
+
+  // --------------------------------------------------
+  // INITIAL AUTH CHECK
+  // --------------------------------------------------
+
+  useEffect(() => {
+    let mounted = true
+
+    const initialize = async () => {
+      try {
+        await authenticate()
+      } finally {
+        if (mounted) {
+          setIsInitializing(false)
+        }
+      }
+    }
+
+    initialize()
+
+    return () => {
+      mounted = false
+    }
+  }, [authenticate])
 
   // --------------------------------------------------
   // SIGN OUT
   // --------------------------------------------------
 
-  const signOut = useCallback(async () => {
+  const signOut = async () => {
     try {
       await api('/api/auth/signout', {
         method: 'POST',
       })
-    } catch {
-      // Clear frontend state even if signout request fails.
+    } catch (err) {
+      console.error('Sign out error:', err)
     }
 
-    setIsAuthenticated(false)
     setUser(null)
+    setIsAuthenticated(false)
     setConversations([])
     setMessages([])
-    setActiveId('')
-    setDraft('')
-    setPageError('')
-  }, [])
-
-  // --------------------------------------------------
-  // CHECK SESSION ON APP START
-  // --------------------------------------------------
-
-  useEffect(() => {
-    let cancelled = false
-
-    async function boot() {
-      try {
-        await authenticate()
-      } catch {
-        if (!cancelled) {
-          setIsAuthenticated(false)
-          setUser(null)
-          setConversations([])
-        }
-      } finally {
-        if (!cancelled) {
-          setAuthLoading(false)
-        }
-      }
-    }
-
-    void boot()
-
-    return () => {
-      cancelled = true
-    }
-  }, [authenticate])
-
-  // --------------------------------------------------
-  // ACTIVE CONVERSATION
-  // --------------------------------------------------
-
-  const activeConversation = useMemo(
-    () => conversations.find(c => c.id === activeId),
-    [conversations, activeId]
-  )
-
-  // --------------------------------------------------
-  // LOAD MESSAGES
-  // --------------------------------------------------
-
-  useEffect(() => {
-    if (!isAuthenticated || !activeId) {
-      setMessages([])
-      return
-    }
-
-    let cancelled = false
-
-    async function loadMessages() {
-      setLoading(true)
-      setPageError('')
-
-      try {
-        const result = await api<ApiEnvelope<Message[]>>(
-          `/api/conversation/${activeId}/messages?page=1&limit=100`
-        )
-
-        if (!cancelled) {
-          setMessages((result.data || []).slice().reverse())
-        }
-      } catch (err) {
-        if (!cancelled) {
-          setMessages([])
-          setPageError(
-            err instanceof Error
-              ? err.message
-              : 'Could not load messages.'
-          )
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false)
-        }
-      }
-    }
-
-    void loadMessages()
-
-    return () => {
-      cancelled = true
-    }
-  }, [isAuthenticated, activeId])
-
-  // --------------------------------------------------
-  // AUTO SCROLL
-  // --------------------------------------------------
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'end',
-    })
-  }, [messages, sending, loading])
+    setActiveConversationId(null)
+    setInput('')
+  }
 
   // --------------------------------------------------
   // CREATE CONVERSATION
   // --------------------------------------------------
 
-  async function createConversation() {
-    if (!isAuthenticated) return
-
-    setPageError('')
+  const createConversation = async () => {
+    setError('')
 
     try {
-      const result = await api<ApiEnvelope<Conversation>>(
+      const response = await api<ApiEnvelope<Conversation>>(
         '/api/conversation',
         {
           method: 'POST',
@@ -877,93 +1806,121 @@ function App() {
         }
       )
 
-      setConversations(prev => [result.data, ...prev])
-      setActiveId(result.data.id)
-      setMessages([])
-      setSidebarOpen(false)
+      const conversation = response.data
 
-      inputRef.current?.focus()
+      setConversations((previous) => [
+        conversation,
+        ...previous.filter((item) => item.id !== conversation.id),
+      ])
+
+      setActiveConversationId(conversation.id)
+      setMessages([])
+      setMobileSidebarOpen(false)
+      textareaRef.current?.focus()
     } catch (err) {
-      setPageError(
+      setError(
         err instanceof Error
           ? err.message
-          : 'Could not create a conversation.'
+          : 'Could not create conversation.'
       )
     }
+  }
+
+  // --------------------------------------------------
+  // LOAD MESSAGES
+  // --------------------------------------------------
+
+  const loadMessages = useCallback(async (conversationId: string) => {
+    setIsLoadingMessages(true)
+    setError('')
+
+    try {
+      const response = await api<ApiEnvelope<Message[]>>(
+        `/api/conversation/${conversationId}/messages`
+      )
+
+      setMessages(response.data || [])
+    } catch (err) {
+      setMessages([])
+      setError(
+        err instanceof Error ? err.message : 'Could not load messages.'
+      )
+    } finally {
+      setIsLoadingMessages(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!activeConversationId) {
+      setMessages([])
+      return
+    }
+
+    loadMessages(activeConversationId)
+  }, [activeConversationId, loadMessages])
+
+  // --------------------------------------------------
+  // SELECT CONVERSATION
+  // --------------------------------------------------
+
+  const selectConversation = (conversationId: string) => {
+    setActiveConversationId(conversationId)
+    setMobileSidebarOpen(false)
+    setError('')
   }
 
   // --------------------------------------------------
   // SEND MESSAGE
   // --------------------------------------------------
 
-  async function sendMessage(event?: FormEvent) {
-    event?.preventDefault()
+  const sendMessage = async () => {
+    const content = input.trim()
 
-    const content = draft.trim()
+    if (!content || isSending) return
 
-    if (!content || sending || !isAuthenticated) return
+    setError('')
+    setInput('')
+    setIsSending(true)
 
-    setDraft('')
-    setPageError('')
-    setSending(true)
-
-    let conversationId = activeId
+    let conversationId = activeConversationId
 
     try {
-      // Create conversation if none is selected.
       if (!conversationId) {
-        const created = await api<ApiEnvelope<Conversation>>(
+        const createResponse = await api<ApiEnvelope<Conversation>>(
           '/api/conversation',
           {
             method: 'POST',
             body: JSON.stringify({
-              title: content.slice(0, 48),
+              title: content.slice(0, 40),
             }),
           }
         )
 
-        conversationId = created.data.id
+        const newConversation = createResponse.data
+        conversationId = newConversation.id
 
-        setConversations(prev => [created.data, ...prev])
-        setActiveId(conversationId)
-      } else if (
-        activeConversation?.title === 'New conversation' &&
-        messages.length === 0
-      ) {
-        const title = content.slice(0, 48)
+        setConversations((previous) => [
+          newConversation,
+          ...previous.filter((item) => item.id !== newConversation.id),
+        ])
 
-        const updated = await api<ApiEnvelope<Conversation>>(
-          `/api/conversation/${conversationId}`,
-          {
-            method: 'PUT',
-            body: JSON.stringify({ title }),
-          }
-        )
-
-        setConversations(prev =>
-          prev.map(c =>
-            c.id === conversationId ? updated.data : c
-          )
-        )
+        setActiveConversationId(newConversation.id)
       }
 
-      // Optimistic user message.
-      const optimistic: Message = {
-        id: `pending-${Date.now()}`,
+      const temporaryMessage: Message = {
+        id: `temp-${Date.now()}`,
         conversationId,
         role: 'user',
         content,
         createdAt: new Date().toISOString(),
       }
 
-      setMessages(prev => [...prev, optimistic])
+      setMessages((previous) => [...previous, temporaryMessage])
 
-      const result = await api<
-        ApiEnvelope<{
-          userMessage: Message
-          assistantMessage: Message
-        }>
-      >(
+      const response = await api<ApiEnvelope<{
+        userMessage: Message
+        assistantMessage: Message
+      }>>(
         `/api/conversation/${conversationId}/messages`,
         {
           method: 'POST',
@@ -971,55 +1928,34 @@ function App() {
         }
       )
 
-      setMessages(prev => [
-        ...prev.filter(m => !m.id.startsWith('pending-')),
-        result.data.userMessage,
-        result.data.assistantMessage,
-      ])
+      setMessages((previous) => {
+        const withoutTemporary = previous.filter(
+          (message) => message.id !== temporaryMessage.id
+        )
 
-      setConversations(prev =>
-        prev
-          .map(c =>
-            c.id === conversationId
-              ? {
-                  ...c,
-                  updatedAt: new Date().toISOString(),
-                }
-              : c
-          )
-          .sort(
-            (a, b) =>
-              +new Date(b.updatedAt) - +new Date(a.updatedAt)
-          )
-      )
+        return [
+          ...withoutTemporary,
+          response.data.userMessage,
+          response.data.assistantMessage,
+        ]
+      })
+
+      await loadConversations()
     } catch (err) {
-      setMessages(prev =>
-        prev.filter(m => !m.id.startsWith('pending-'))
+      setError(
+        err instanceof Error ? err.message : 'Could not send message.'
       )
 
-      setDraft(content)
-
-      setPageError(
-        err instanceof Error
-          ? err.message
-          : 'Message could not be sent.'
-      )
+      if (conversationId) {
+        try {
+          await loadMessages(conversationId)
+        } catch {
+          // Keep the original request error.
+        }
+      }
     } finally {
-      setSending(false)
-      inputRef.current?.focus()
-    }
-  }
-
-  // --------------------------------------------------
-  // COMPOSER KEYBOARD
-  // --------------------------------------------------
-
-  function handleComposerKey(
-    event: KeyboardEvent<HTMLTextAreaElement>
-  ) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      void sendMessage()
+      setIsSending(false)
+      textareaRef.current?.focus()
     }
   }
 
@@ -1027,25 +1963,28 @@ function App() {
   // DELETE CONVERSATION
   // --------------------------------------------------
 
-  async function deleteConversation(id: string) {
-    if (!isAuthenticated) return
+  const deleteConversation = async (conversationId: string) => {
+    const confirmed = window.confirm(
+      'Are you sure you want to delete this conversation?'
+    )
+
+    if (!confirmed) return
 
     try {
-      await api(`/api/conversation/${id}`, {
+      await api(`/api/conversation/${conversationId}`, {
         method: 'DELETE',
       })
 
-      const remaining = conversations.filter(c => c.id !== id)
+      setConversations((previous) =>
+        previous.filter((item) => item.id !== conversationId)
+      )
 
-      setConversations(remaining)
-      setMenuId('')
-
-      if (activeId === id) {
-        setActiveId(remaining[0]?.id || '')
+      if (activeConversationId === conversationId) {
+        setActiveConversationId(null)
         setMessages([])
       }
     } catch (err) {
-      setPageError(
+      setError(
         err instanceof Error
           ? err.message
           : 'Could not delete conversation.'
@@ -1057,99 +1996,127 @@ function App() {
   // RENAME CONVERSATION
   // --------------------------------------------------
 
-  async function renameConversation(id: string) {
-    const title = renameValue.trim()
+  const startEditing = (conversation: Conversation) => {
+    setEditingConversationId(conversation.id)
+    setEditingTitle(conversation.title)
+  }
 
-    if (title.length < 2 || !isAuthenticated) return
+  const saveConversationTitle = async (conversationId: string) => {
+    const title = editingTitle.trim()
+
+    if (!title) {
+      setEditingConversationId(null)
+      return
+    }
 
     try {
-      const result = await api<ApiEnvelope<Conversation>>(
-        `/api/conversation/${id}`,
+      const response = await api<ApiEnvelope<Conversation>>(
+        `/api/conversation/${conversationId}`,
         {
-          method: 'PUT',
+          method: 'PATCH',
           body: JSON.stringify({ title }),
         }
       )
 
-      setConversations(prev =>
-        prev.map(c => c.id === id ? result.data : c)
+      setConversations((previous) =>
+        previous.map((conversation) =>
+          conversation.id === conversationId
+            ? response.data
+            : conversation
+        )
       )
-
-      setRenamingId('')
-      setMenuId('')
     } catch (err) {
-      setPageError(
+      setError(
         err instanceof Error
           ? err.message
           : 'Could not rename conversation.'
       )
+    } finally {
+      setEditingConversationId(null)
+      setEditingTitle('')
     }
   }
 
   // --------------------------------------------------
-  // FILTER CONVERSATIONS
+  // KEYBOARD HANDLING
   // --------------------------------------------------
 
-  const filteredConversations = conversations.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase())
-  )
-
-  // --------------------------------------------------
-  // AUTH LOADING
-  // --------------------------------------------------
-
-  if (authLoading) {
-    return (
-      <main className="auth-page">
-        <div className="loading-line">
-          <span className="spinner" />
-          Checking your session...
-        </div>
-      </main>
-    )
+  const handleKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault()
+      sendMessage()
+    }
   }
 
   // --------------------------------------------------
-  // AUTH SCREEN
+  // SCROLL TO BOTTOM
   // --------------------------------------------------
 
-  if (!isAuthenticated || !user) {
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({
+      behavior: 'smooth',
+    })
+  }, [messages, isSending])
+
+  // --------------------------------------------------
+  // THEME
+  // --------------------------------------------------
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('light-mode', !darkMode)
+  }, [darkMode])
+
+  // --------------------------------------------------
+  // LOADING SCREEN
+  // --------------------------------------------------
+
+  if (isInitializing) {
+    return (
+      <div className="loading-screen">
+        <div className="loading-logo">
+          <Icon name="sparkle" size={30} />
+        </div>
+        <p>Loading Nova AI...</p>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
     return <AuthScreen onAuthenticated={authenticate} />
   }
 
   // --------------------------------------------------
-  // CHAT APPLICATION
+  // MAIN UI
   // --------------------------------------------------
 
   return (
-    <main className={`app-shell ${dark ? 'theme-dark' : 'theme-light'}`}>
-
-      {sidebarOpen && (
-        <button
-          className="mobile-scrim"
-          aria-label="Close sidebar"
-          onClick={() => setSidebarOpen(false)}
+    <div className={`app ${darkMode ? 'dark' : 'light'}`}>
+      {mobileSidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setMobileSidebarOpen(false)}
         />
       )}
 
-      {/* SIDEBAR */}
-
-      <aside className={`sidebar ${sidebarOpen ? 'sidebar-open' : ''}`}>
-
-        <div className="sidebar-top">
-          <a className="brand" href="#home">
-            <span className="brand-mark">
-              <Icon name="sparkle" size={20} />
-            </span>
-            <span>
-              chat<span className="brand-light">.ai</span>
-            </span>
-          </a>
+      <aside
+        className={[
+          'sidebar',
+          sidebarOpen ? 'sidebar-open' : 'sidebar-collapsed',
+          mobileSidebarOpen ? 'mobile-open' : '',
+        ].join(' ')}
+      >
+        <div className="sidebar-header">
+          <div className="sidebar-brand">
+            <div className="brand-icon">
+              <Icon name="sparkle" size={22} />
+            </div>
+            {sidebarOpen && <span>Nova AI</span>}
+          </div>
 
           <button
-            className="icon-button sidebar-collapse"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
+            className="icon-button sidebar-toggle"
+            onClick={() => setSidebarOpen((previous) => !previous)}
+            title="Toggle sidebar"
           >
             <Icon name="menu" />
           </button>
@@ -1157,446 +2124,337 @@ function App() {
 
         <button
           className="new-chat-button"
-          onClick={() => void createConversation()}
+          onClick={createConversation}
         >
-          <Icon name="plus" size={18} />
-          <span>New chat</span>
+          <Icon name="plus" />
+          {sidebarOpen && <span>New chat</span>}
         </button>
 
-        <label className="search-box">
-          <Icon name="search" size={16} />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Search conversations"
-          />
-        </label>
+        {sidebarOpen && (
+          <>
+            <div className="sidebar-search">
+              <Icon name="search" size={16} />
+              <input
+                type="text"
+                placeholder="Search conversations..."
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+            </div>
 
-        <div className="side-section-label">
-          YOUR SPACE <span>{conversations.length}</span>
-        </div>
+            <div className="conversation-section">
+              <div className="section-title">Your conversations</div>
 
-        <div className="conversation-list">
-
-          {filteredConversations.map(conversation => (
-            <div
-              key={conversation.id}
-              className={`conversation-row ${
-                activeId === conversation.id ? 'selected' : ''
-              }`}
-            >
-              {renamingId === conversation.id ? (
-                <form
-                  className="rename-form"
-                  onSubmit={e => {
-                    e.preventDefault()
-                    void renameConversation(conversation.id)
-                  }}
-                >
-                  <input
-                    autoFocus
-                    value={renameValue}
-                    onChange={e => setRenameValue(e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === 'Escape') setRenamingId('')
-                    }}
-                  />
-
-                  <button type="submit">Save</button>
-                </form>
-              ) : (
-                <>
-                  <button
-                    className="conversation-select"
-                    onClick={() => {
-                      setActiveId(conversation.id)
-                      setSidebarOpen(false)
-                    }}
-                  >
-                    <Icon name="message" size={16} />
-                    <span>{conversation.title}</span>
-                  </button>
-
-                  <button
-                    className="conversation-more"
-                    aria-label="Conversation actions"
-                    onClick={() =>
-                      setMenuId(
-                        menuId === conversation.id
-                          ? ''
-                          : conversation.id
-                      )
-                    }
-                  >
-                    ···
-                  </button>
-
-                  {menuId === conversation.id && (
-                    <div className="conversation-menu">
+              <div className="conversation-list">
+                {filteredConversations.length === 0 ? (
+                  <div className="empty-conversations">
+                    No conversations found
+                  </div>
+                ) : (
+                  filteredConversations.map((conversation) => (
+                    <div
+                      key={conversation.id}
+                      className={[
+                        'conversation-item',
+                        activeConversationId === conversation.id
+                          ? 'active'
+                          : '',
+                      ].join(' ')}
+                    >
                       <button
-                        onClick={() => {
-                          setRenameValue(conversation.title)
-                          setRenamingId(conversation.id)
-                          setMenuId('')
-                        }}
-                      >
-                        <Icon name="edit" size={14} />
-                        Rename
-                      </button>
-
-                      <button
-                        className="danger-action"
+                        className="conversation-select"
                         onClick={() =>
-                          void deleteConversation(conversation.id)
+                          selectConversation(conversation.id)
                         }
                       >
-                        <Icon name="trash" size={14} />
-                        Delete
+                        <Icon name="message" size={16} />
+
+                        {editingConversationId === conversation.id ? (
+                          <input
+                            className="rename-input"
+                            value={editingTitle}
+                            autoFocus
+                            onChange={(event) =>
+                              setEditingTitle(event.target.value)
+                            }
+                            onBlur={() =>
+                              saveConversationTitle(conversation.id)
+                            }
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter') {
+                                saveConversationTitle(conversation.id)
+                              }
+
+                              if (event.key === 'Escape') {
+                                setEditingConversationId(null)
+                              }
+
+                              event.stopPropagation()
+                            }}
+                            onClick={(event) => event.stopPropagation()}
+                          />
+                        ) : (
+                          <span className="conversation-title">
+                            {conversation.title}
+                          </span>
+                        )}
                       </button>
+
+                      {editingConversationId !== conversation.id && (
+                        <div className="conversation-actions">
+                          <button
+                            className="icon-button"
+                            title="Rename"
+                            onClick={() => startEditing(conversation)}
+                          >
+                            <Icon name="edit" size={14} />
+                          </button>
+
+                          <button
+                            className="icon-button delete-button"
+                            title="Delete"
+                            onClick={() =>
+                              deleteConversation(conversation.id)
+                            }
+                          >
+                            <Icon name="trash" size={14} />
+                          </button>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </>
-              )}
+                  ))
+                )}
+              </div>
             </div>
-          ))}
+          </>
+        )}
 
-          {!filteredConversations.length && (
-            <p className="empty-search">
-              {search
-                ? 'No matching conversations'
-                : 'Your conversations will appear here.'}
-            </p>
-          )}
-        </div>
+        <div className="sidebar-footer">
+          <button
+            className="sidebar-footer-button"
+            onClick={() => setDarkMode((previous) => !previous)}
+          >
+            <Icon name="sun" />
+            {sidebarOpen && (
+              <span>{darkMode ? 'Light mode' : 'Dark mode'}</span>
+            )}
+          </button>
 
-        {/* SIDEBAR BOTTOM */}
-
-        <div className="sidebar-bottom">
-
-          <div className="upgrade-card">
-            <div className="upgrade-icon">
-              <Icon name="sparkle" size={18} />
-            </div>
-
-            <strong>A little more magic</strong>
-
-            <p>Your ideas deserve room to grow.</p>
-
-            <button
-              onClick={() =>
-                setPageError(
-                  'You are already using the Nova AI workspace.'
-                )
-              }
-            >
-              Explore Nova <span>↗</span>
-            </button>
-          </div>
-
-          <div className="profile-row">
-            <div className="profile-avatar">
-              {user.id.slice(0, 1).toUpperCase()}
+          <div className="user-profile">
+            <div className="user-avatar">
+              {user?.id?.slice(0, 1).toUpperCase() || 'U'}
             </div>
 
-            <div className="profile-info">
-              <strong>Your account</strong>
-              <span>Personal workspace</span>
-            </div>
+            {sidebarOpen && (
+              <>
+                <div className="user-info">
+                  <span className="user-name">My account</span>
+                  <span className="user-email">Signed in</span>
+                </div>
 
-            <button
-              className="icon-button"
-              onClick={() => void signOut()}
-              title="Sign out"
-              aria-label="Sign out"
-            >
-              <Icon name="logout" size={17} />
-            </button>
+                <button
+                  className="icon-button logout-button"
+                  title="Sign out"
+                  onClick={signOut}
+                >
+                  <Icon name="logout" />
+                </button>
+              </>
+            )}
           </div>
         </div>
       </aside>
 
-      {/* CHAT PANEL */}
+      <main className="main-content">
+        <header className="topbar">
+          <button
+            className="icon-button mobile-menu-button"
+            onClick={() => setMobileSidebarOpen(true)}
+          >
+            <Icon name="menu" />
+          </button>
 
-      <section className="chat-panel">
-
-        <header className="chat-header">
-
-          <div className="chat-header-left">
-            <button
-              className="icon-button mobile-menu"
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Open sidebar"
-            >
-              <Icon name="menu" />
-            </button>
-
-            <div className="model-badge">
-              <span className="model-dot">
-                <Icon name="sparkle" size={15} />
-              </span>
-
-              <span>Nova Assistant</span>
-              <span className="model-pill">AI</span>
-            </div>
+          <div className="topbar-title">
+            {activeConversation?.title || 'New conversation'}
           </div>
 
-          <div className="header-actions">
-            <span className="secure-indicator">
-              <i /> Private session
-            </span>
-
+          <div className="topbar-actions">
             <button
-              className="icon-button theme-toggle"
+              className="icon-button"
               title="Toggle theme"
-              aria-label="Toggle theme"
-              onClick={() => setDark(!dark)}
+              onClick={() => setDarkMode((previous) => !previous)}
             >
-              <Icon name="sun" size={18} />
-            </button>
-
-            <button
-              className="header-avatar"
-              title="Account"
-              onClick={() => void signOut()}
-            >
-              {user.id.slice(0, 1).toUpperCase()}
+              <Icon name="sun" />
             </button>
           </div>
         </header>
 
-        {/* CHAT CONTENT */}
-
-        <div
-          className={`chat-content ${
-            messages.length ? 'has-messages' : ''
-          }`}
-        >
-          {messages.length === 0 && !loading ? (
+        <section className="chat-area">
+          {!activeConversationId ? (
             <div className="welcome-screen">
-
-              <div className="welcome-symbol">
-                <span className="welcome-ring ring-one" />
-                <span className="welcome-ring ring-two" />
-
-                <span className="welcome-center">
-                  <Icon name="sparkle" size={30} />
-                </span>
-
-                <span className="welcome-twinkle twinkle-one">✦</span>
-                <span className="welcome-twinkle twinkle-two">✧</span>
+              <div className="welcome-icon">
+                <Icon name="sparkle" size={34} />
               </div>
 
-              <p className="welcome-overline">
-                A LITTLE CURIOSITY GOES A LONG WAY
-              </p>
+              <h1>How can I help you today?</h1>
 
-              <h1>
-                What’s on your <span>mind?</span>
-              </h1>
-
-              <p className="welcome-description">
-                A question, a challenge, a half-formed idea.<br />
-                Let’s figure it out together.
+              <p>
+                Ask me anything. I'm here to help you think, learn, and create.
               </p>
 
               <div className="suggestion-grid">
-
                 <button
+                  className="suggestion-card"
                   onClick={() =>
-                    setDraft(
-                      'Explain a complex idea in a simple way'
-                    )
+                    setInput('Explain how REST APIs work.')
                   }
                 >
-                  <span className="suggestion-icon lavender">✳</span>
-                  <span>
-                    <strong>Make it make sense</strong>
-                    <small>Explain something complex</small>
-                  </span>
-                  <span className="suggestion-arrow">↗</span>
+                  <Icon name="message" />
+                  <span>Explain a concept</span>
+                  <small>Learn something new</small>
                 </button>
 
                 <button
+                  className="suggestion-card"
                   onClick={() =>
-                    setDraft(
-                      'Help me brainstorm creative ideas for a project'
-                    )
+                    setInput('Help me write clean and maintainable code.')
                   }
                 >
-                  <span className="suggestion-icon peach">✦</span>
-                  <span>
-                    <strong>Think outside the box</strong>
-                    <small>Brainstorm fresh ideas</small>
-                  </span>
-                  <span className="suggestion-arrow">↗</span>
+                  <Icon name="edit" />
+                  <span>Write some code</span>
+                  <small>Build and debug projects</small>
                 </button>
 
                 <button
+                  className="suggestion-card"
                   onClick={() =>
-                    setDraft(
-                      'Help me write a clear, compelling piece of text'
-                    )
+                    setInput('Give me ideas for a new project.')
                   }
                 >
-                  <span className="suggestion-icon mint">✎</span>
-                  <span>
-                    <strong>Find the right words</strong>
-                    <small>Write, rewrite, refine</small>
-                  </span>
-                  <span className="suggestion-arrow">↗</span>
+                  <Icon name="sparkle" />
+                  <span>Brainstorm ideas</span>
+                  <small>Explore new possibilities</small>
                 </button>
 
                 <button
+                  className="suggestion-card"
                   onClick={() =>
-                    setDraft(
-                      'Help me plan my next project step by step'
-                    )
+                    setInput('Help me create a learning plan.')
                   }
                 >
-                  <span className="suggestion-icon blue">⌁</span>
-                  <span>
-                    <strong>Turn plans into action</strong>
-                    <small>Map out your next steps</small>
-                  </span>
-                  <span className="suggestion-arrow">↗</span>
+                  <Icon name="sun" />
+                  <span>Make a plan</span>
+                  <small>Organize your next steps</small>
                 </button>
-
               </div>
             </div>
           ) : (
-            <div className="message-thread">
+            <div className="messages-container">
+              {isLoadingMessages ? (
+                <div className="messages-loading">
+                  <div className="typing-indicator">
+                    <span />
+                    <span />
+                    <span />
+                  </div>
+                  <p>Loading messages...</p>
+                </div>
+              ) : messages.length === 0 ? (
+                <div className="empty-chat">
+                  <div className="welcome-icon">
+                    <Icon name="sparkle" size={28} />
+                  </div>
+                  <h2>Start a conversation</h2>
+                  <p>Send a message to begin chatting with Nova AI.</p>
+                </div>
+              ) : (
+                messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`message-row ${message.role}`}
+                  >
+                    <div className="message-avatar">
+                      {message.role === 'user' ? (
+                        'U'
+                      ) : (
+                        <Icon name="sparkle" size={18} />
+                      )}
+                    </div>
 
-              {loading && messages.length === 0 && (
-                <div className="loading-line">
-                  <span className="spinner" />
-                  Loading conversation…
+                    <div className="message-body">
+                      <div className="message-author">
+                        {message.role === 'user' ? 'You' : 'Nova AI'}
+                      </div>
+
+                      <MessageContent content={message.content} />
+                    </div>
+                  </div>
+                ))
+              )}
+
+              {isSending && (
+                <div className="message-row assistant">
+                  <div className="message-avatar">
+                    <Icon name="sparkle" size={18} />
+                  </div>
+
+                  <div className="message-body">
+                    <div className="message-author">Nova AI</div>
+                    <div className="typing-indicator">
+                      <span />
+                      <span />
+                      <span />
+                    </div>
+                  </div>
                 </div>
               )}
 
-              {messages.map(message => (
-                <article
-                  key={message.id}
-                  className={`message ${
-                    message.role === 'user'
-                      ? 'user-message'
-                      : 'assistant-message'
-                  }`}
-                >
-                  <div
-                    className={`message-avatar ${
-                      message.role === 'assistant'
-                        ? 'ai-avatar'
-                        : ''
-                    }`}
-                  >
-                    {message.role === 'assistant'
-                      ? <Icon name="sparkle" size={16} />
-                      : user.id.slice(0, 1).toUpperCase()}
-                  </div>
-
-                  <div className="message-body">
-                    <div className="message-author">
-                      {message.role === 'assistant' ? 'Nova' : 'You'}
-
-                      <span>
-                        {new Date(message.createdAt).toLocaleTimeString(
-                          [],
-                          {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                          }
-                        )}
-                      </span>
-                    </div>
-
-                    <div className="message-text">
-                      {message.content}
-                    </div>
-                  </div>
-                </article>
-              ))}
-
-              {sending && (
-                <article className="message assistant-message">
-                  <div className="message-avatar ai-avatar">
-                    <Icon name="sparkle" size={16} />
-                  </div>
-
-                  <div className="message-body">
-                    <div className="message-author">
-                      Nova <span>thinking</span>
-                    </div>
-
-                    <div className="typing-indicator">
-                      <i /><i /><i />
-                    </div>
-                  </div>
-                </article>
-              )}
-
-              <div ref={bottomRef} />
+              <div ref={messagesEndRef} />
             </div>
           )}
-        </div>
 
-        {/* ERROR */}
+          {error && (
+            <div className="chat-error">
+              <span>{error}</span>
+              <button
+                className="icon-button"
+                onClick={() => setError('')}
+                title="Dismiss"
+              >
+                <Icon name="close" size={15} />
+              </button>
+            </div>
+          )}
 
-        {pageError && (
-          <div className="page-error" role="alert">
-            <span>{pageError}</span>
-
-            <button
-              onClick={() => setPageError('')}
-              aria-label="Dismiss error"
-            >
-              <Icon name="close" size={15} />
-            </button>
-          </div>
-        )}
-
-        {/* COMPOSER */}
-
-        <div className="composer-wrap">
-          <form
-            className="composer"
-            onSubmit={sendMessage}
-          >
-            <textarea
-              ref={inputRef}
-              rows={1}
-              value={draft}
-              onChange={e => setDraft(e.target.value)}
-              onKeyDown={handleComposerKey}
-              placeholder="Ask anything…"
-              aria-label="Message Nova"
-            />
-
-            <div className="composer-bottom">
-              <div className="composer-tools">
-                <span className="composer-hint">
-                  <kbd>↵</kbd> to send
-                  <span>·</span>
-                  <kbd>shift + ↵</kbd> for a new line
-                </span>
-              </div>
+          <div className="composer-wrapper">
+            <div className="composer">
+              <textarea
+                ref={textareaRef}
+                value={input}
+                onChange={(event) => setInput(event.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Message Nova AI..."
+                rows={1}
+                disabled={isSending}
+              />
 
               <button
                 className="send-button"
-                type="submit"
-                disabled={!draft.trim() || sending}
-                aria-label="Send message"
+                onClick={sendMessage}
+                disabled={!input.trim() || isSending}
+                title="Send message"
               >
-                <Icon name="send" size={17} />
+                <Icon name="send" size={18} />
               </button>
             </div>
-          </form>
 
-          <p className="disclaimer">
-            Nova can make mistakes. Check important information.
-          </p>
-        </div>
-      </section>
-    </main>
+            <p className="composer-disclaimer">
+              Nova AI can make mistakes. Check important information.
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }
 
