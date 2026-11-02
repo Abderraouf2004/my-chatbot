@@ -10,8 +10,6 @@ import { RedisStore } from "rate-limit-redis";
 import { ApiError } from "../errors/api-error";
 import { redisService } from "../services/redis";
 
-// RedisStore loads a Lua script when the limiter is created, but the Redis client only
-// connects later (in main.ts). This wrapper creates the real store on first use instead.
 class LazyRedisStore implements Store {
   readonly prefix: string;
   private options?: Options;
@@ -85,7 +83,6 @@ const MINUTE = 60 * 1000;
 const ip = (req: Request) => ipKeyGenerator(req.ip ?? "unknown");
 const userOrIp = (req: Request) => req.user?.id ?? ip(req);
 
-// Whole API, per IP.
 export const apiLimiter = createLimiter({
   name: "api",
   windowMs: 15 * MINUTE,
@@ -93,7 +90,6 @@ export const apiLimiter = createLimiter({
   key: ip,
 });
 
-// Wrong passwords: 10 failures per IP + email per 15 minutes (successful logins don't count).
 export const signinLimiter = createLimiter({
   name: "signin",
   windowMs: 15 * MINUTE,
@@ -106,7 +102,6 @@ export const signinLimiter = createLimiter({
   message: "Too many sign-in attempts. Please try again in 15 minutes.",
 });
 
-// Account creation: 5 per hour per IP.
 export const signupLimiter = createLimiter({
   name: "signup",
   windowMs: 60 * MINUTE,
@@ -122,7 +117,6 @@ export const refreshLimiter = createLimiter({
   key: ip,
 });
 
-// Every message costs a Gemini call: per user burst + daily quota. Adjust to your budget.
 export const messageBurstLimiter = createLimiter({
   name: "msg-burst",
   windowMs: MINUTE,

@@ -4,7 +4,9 @@ import { redisService } from "./services/redis";
 import cors from "cors";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
-
+import { apiLimiter } from "./middleware/rate-limit";
+import { errorHandler } from "./errors/error-handler";
+import { notFoundHandler } from "./errors/not-found";
 const app = express();
 app.set("trust proxy", 1);
 app.use(
@@ -24,10 +26,13 @@ app.use(
   }),
 );
 app.use(cookieParser());
-app.use(express.json());
-
+// app.use(express.json());
+app.use(express.json({ limit: "32kb" }));
 const PORT = process.env.PORT || 3000;
-app.use("/api", router);
+// app.use("/api", router);
+app.use("/api", apiLimiter, router);
+app.use(notFoundHandler);
+app.use(errorHandler);
 let server: ReturnType<typeof app.listen>;
 
 async function startServer() {

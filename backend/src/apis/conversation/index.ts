@@ -9,7 +9,10 @@ import {
 import { ConversationController } from "../../core/conversation/controller";
 import { authMiddleware } from "../../middleware/auth";
 import { PaginationQuerySchema } from "../../modules/shared/pagination.schema";
-
+import {
+  messageBurstLimiter,
+  messageDailyLimiter,
+} from "../../middleware/rate-limit";
 const conversation = Router();
 
 conversation.post(
@@ -26,13 +29,20 @@ conversation.get(
   ConversationController.getAll,
 );
 
+// conversation.post(
+//   "/:id/messages",
+//   authMiddleware,
+//   validateRequestInput({ params: IdParamSchema, body: CreateMessageSchema }),
+//   ConversationController.createmessage,
+// );
 conversation.post(
   "/:id/messages",
   authMiddleware,
   validateRequestInput({ params: IdParamSchema, body: CreateMessageSchema }),
+  messageBurstLimiter,
+  messageDailyLimiter,
   ConversationController.createmessage,
 );
-
 conversation.get(
   "/:id/messages",
   authMiddleware,

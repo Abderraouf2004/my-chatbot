@@ -5,9 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { FormEvent, KeyboardEvent, ReactNode } from 'react'
 import './App.css'
 
-// --------------------------------------------------
-// TYPES
-// --------------------------------------------------
+
 
 type User = {
   id: string
@@ -38,17 +36,13 @@ type ApiEnvelope<T> = {
   }
 }
 
-// --------------------------------------------------
-// API CONFIGURATION
-// --------------------------------------------------
+
 
 const API_URL = (
   import.meta.env.VITE_API_URL || 'http://localhost:3000'
 ).replace(/\/$/, '')
 
-// --------------------------------------------------
-// API CLIENT + AUTOMATIC TOKEN REFRESH
-// --------------------------------------------------
+
 
 let refreshPromise: Promise<boolean> | null = null
 
@@ -133,9 +127,7 @@ async function api<T>(
   return payload as T
 }
 
-// --------------------------------------------------
-// ICON
-// --------------------------------------------------
+
 
 function Icon({
   name,
@@ -277,9 +269,6 @@ function Icon({
   )
 }
 
-// --------------------------------------------------
-// AUTH SCREEN
-// --------------------------------------------------
 
 function AuthScreen({
   onAuthenticated,
@@ -552,9 +541,6 @@ function App() {
   const bottomRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
-  // --------------------------------------------------
-  // LOAD CONVERSATIONS
-  // --------------------------------------------------
 
   const loadConversations = useCallback(async () => {
     const result = await api<ApiEnvelope<Conversation[]>>(
@@ -566,9 +552,7 @@ function App() {
     return result.data || []
   }, [])
 
-  // --------------------------------------------------
-  // AUTHENTICATION
-  // --------------------------------------------------
+  
 
   const authenticate = useCallback(async () => {
     let result: ApiEnvelope<{ user: User }>
@@ -606,9 +590,6 @@ function App() {
     }
   }, [loadConversations])
 
-  // --------------------------------------------------
-  // SIGN OUT
-  // --------------------------------------------------
 
   const signOut = useCallback(async () => {
     try {
@@ -630,9 +611,7 @@ function App() {
     setRenamingId('')
   }, [])
 
-  // --------------------------------------------------
-  // CHECK SESSION ON APP START
-  // --------------------------------------------------
+ 
 
   useEffect(() => {
     let cancelled = false
@@ -660,18 +639,14 @@ function App() {
     }
   }, [authenticate])
 
-  // --------------------------------------------------
-  // ACTIVE CONVERSATION
-  // --------------------------------------------------
+ 
 
   const activeConversation = useMemo(
     () => conversations.find(c => c.id === activeId),
     [conversations, activeId]
   )
 
-  // --------------------------------------------------
-  // LOAD MESSAGES
-  // --------------------------------------------------
+  
 
   useEffect(() => {
     if (!isAuthenticated || !activeId) {
@@ -717,9 +692,7 @@ function App() {
     }
   }, [isAuthenticated, activeId])
 
-  // --------------------------------------------------
-  // AUTO SCROLL
-  // --------------------------------------------------
+  
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({
@@ -728,9 +701,6 @@ function App() {
     })
   }, [messages, sending, loading])
 
-  // --------------------------------------------------
-  // CREATE CONVERSATION
-  // --------------------------------------------------
 
   async function createConversation() {
     if (!isAuthenticated) return
@@ -764,9 +734,6 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // SEND MESSAGE
-  // --------------------------------------------------
 
   async function sendMessage(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault()
@@ -782,7 +749,7 @@ function App() {
     let conversationId = activeId
 
     try {
-      // Create conversation if none is selected.
+      
 
       if (!conversationId) {
         const created = await api<ApiEnvelope<Conversation>>(
@@ -820,7 +787,7 @@ function App() {
         )
       }
 
-      // Optimistic user message.
+     
 
       const optimistic: Message = {
         id: `pending-${Date.now()}`,
@@ -884,9 +851,7 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // COMPOSER KEYBOARD
-  // --------------------------------------------------
+ 
 
   function handleComposerKey(
     event: KeyboardEvent<HTMLTextAreaElement>
@@ -897,9 +862,7 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // DELETE CONVERSATION
-  // --------------------------------------------------
+  
 
   async function deleteConversation(id: string) {
     if (!isAuthenticated) return
@@ -927,9 +890,7 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // RENAME CONVERSATION
-  // --------------------------------------------------
+ 
 
   async function renameConversation(id: string, value: string) {
     const title = value.trim()
@@ -961,17 +922,12 @@ function App() {
     }
   }
 
-  // --------------------------------------------------
-  // FILTER CONVERSATIONS
-  // --------------------------------------------------
+ 
 
   const filteredConversations = conversations.filter(c =>
     c.title.toLowerCase().includes(search.toLowerCase())
   )
 
-  // --------------------------------------------------
-  // AUTH LOADING
-  // --------------------------------------------------
 
   if (authLoading) {
     return (
@@ -984,17 +940,12 @@ function App() {
     )
   }
 
-  // --------------------------------------------------
-  // AUTH SCREEN
-  // --------------------------------------------------
+
 
   if (!isAuthenticated || !user) {
     return <AuthScreen onAuthenticated={authenticate} />
   }
 
-  // --------------------------------------------------
-  // CHAT APPLICATION
-  // --------------------------------------------------
 
   return (
     <main className={`app-shell ${dark ? 'theme-dark' : 'theme-light'}`}>
@@ -1486,6 +1437,7 @@ function App() {
               onKeyDown={handleComposerKey}
               placeholder="Ask anything…"
               aria-label="Message Nova"
+              maxLength={4000}
             />
 
             <div className="composer-bottom">
