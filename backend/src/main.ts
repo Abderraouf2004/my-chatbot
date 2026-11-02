@@ -26,10 +26,8 @@ app.use(
   }),
 );
 app.use(cookieParser());
-// app.use(express.json());
 app.use(express.json({ limit: "32kb" }));
 const PORT = process.env.PORT || 3000;
-// app.use("/api", router);
 app.use("/api", apiLimiter, router);
 app.use(notFoundHandler);
 app.use(errorHandler);
