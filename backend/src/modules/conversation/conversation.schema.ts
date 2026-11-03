@@ -4,6 +4,12 @@ export const IdParamSchema = Joi.object({
   id: Joi.string().uuid().required(),
 });
 
+export const IdempotencyKeySchema = Joi.object({
+  "idempotency-key": Joi.string()
+    .pattern(/^[a-zA-Z0-9_-]{1,100}$/)
+    .required(),
+}).unknown(true);
+
 export const ConversationDTOSchema = Joi.object({
   id: Joi.string().uuid().required(),
   title: Joi.string().min(2).max(100).required(),

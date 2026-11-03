@@ -35,7 +35,6 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 const TIMEOUT_MS = Number(process.env.GEMINI_TIMEOUT_MS) || 30_000;
-
 export async function generateResponse(message: string): Promise<string> {
   let text: string | undefined;
 

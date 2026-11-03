@@ -7,12 +7,14 @@ type RequestSchemas = {
   body?: Joi.ObjectSchema<any>;
   query?: Joi.ObjectSchema<any>;
   params?: Joi.ObjectSchema<any>;
+  headers?: Joi.ObjectSchema<any>;
 };
 
 export const validateRequestInput = ({
   body: bodySchema,
   params: paramSchema,
   query: querySchema,
+  headers: headersSchema,
 }: RequestSchemas): RequestHandler =>
   tryCatch((req: Request, _res: Response, next: NextFunction) => {
     if (bodySchema) {
@@ -32,6 +34,9 @@ export const validateRequestInput = ({
         configurable: true,
         enumerable: true,
       });
+    }
+    if (headersSchema) {
+      Object.assign(req.headers, validateObject(headersSchema, req.headers));
     }
     next();
   });

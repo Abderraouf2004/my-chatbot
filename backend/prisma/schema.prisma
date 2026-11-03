@@ -42,8 +42,10 @@ model Message {
   role           Role
   content        String
   createdAt      DateTime     @default(now())
+  idempotencyKey String?
   conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
 
+  @@unique([conversationId, idempotencyKey, role])
   @@index([conversationId, createdAt(sort: Desc)])
 }
 

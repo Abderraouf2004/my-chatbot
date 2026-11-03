@@ -3,6 +3,7 @@ import { validateRequestInput } from "../../errors/validate-request-input";
 import {
   CreateConversationSchema,
   CreateMessageSchema,
+  IdempotencyKeySchema,
   IdParamSchema,
   UpdateConversationSchema,
 } from "../../modules/conversation/conversation.schema";
@@ -38,7 +39,11 @@ conversation.get(
 conversation.post(
   "/:id/messages",
   authMiddleware,
-  validateRequestInput({ params: IdParamSchema, body: CreateMessageSchema }),
+  validateRequestInput({
+    params: IdParamSchema,
+    body: CreateMessageSchema,
+    headers: IdempotencyKeySchema,
+  }),
   messageBurstLimiter,
   messageDailyLimiter,
   ConversationController.createmessage,

@@ -56,6 +56,7 @@ export const ConversationController = {
       req.params.id as string,
       req.body,
       req.user?.id as string,
+      req.get("Idempotency-Key") as string
     );
     res.status(201).json({ data, message: "Message created successfully" });
   }),

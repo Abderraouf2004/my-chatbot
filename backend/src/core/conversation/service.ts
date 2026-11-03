@@ -43,19 +43,65 @@ export const ConversationService = {
     return validateObject<Conversation.DTO>(ConversationDTOSchema, data);
   },
 
+  // createmessage: async (
+  //   id: string,
+  //   data: Conversation.CreateMessage,
+  //   userId: string,
+  //   idempotencyKey: string,
+  // ) => {
+  //   const message = await ConversationRepo.createmessage(
+  //     id,
+  //     data,
+  //     userId,
+  //     idempotencyKey,
+  //   );
+
+  //   const aiContent = await generateResponse(data.content);
+
+  //   const assistantMessage = await ConversationRepo.createAssistantMessage(
+  //     id,
+  //     aiContent,
+  //   );
+  //   return {
+  //     userMessage: validateObject<Conversation.DTOMessage>(
+  //       MessageDTOSchema,
+  //       message,
+  //     ),
+  //     assistantMessage: validateObject<Conversation.DTOMessage>(
+  //       MessageDTOSchema,
+  //       assistantMessage,
+  //     ),
+  //   };
+  // },
+
   createmessage: async (
     id: string,
     data: Conversation.CreateMessage,
     userId: string,
+    idempotencyKey: string,
   ) => {
-    const message = await ConversationRepo.createmessage(id, data, userId);
-    const aiContent = await generateResponse(data.content);
-
-    const assistantMessage = await ConversationRepo.createAssistantMessage(
+    const message = await ConversationRepo.createmessage(
       id,
-      aiContent,
+      data,
+      userId,
+      idempotencyKey,
     );
-    // return validateObject<Conversation.DTOMessage>(MessageDTOSchema, message);
+
+    let assistantMessage = await ConversationRepo.getAssistantMessage(
+      id,
+      idempotencyKey,
+    );
+
+    if (!assistantMessage) {
+      const aiContent = await generateResponse(message.content);
+
+      assistantMessage = await ConversationRepo.createAssistantMessage(
+        id,
+        aiContent,
+        idempotencyKey,
+      );
+    }
+
     return {
       userMessage: validateObject<Conversation.DTOMessage>(
         MessageDTOSchema,
