@@ -739,7 +739,7 @@ function App() {
     event?.preventDefault()
 
     const content = draft.trim()
-
+    const idempotencyKey = crypto.randomUUID()
     if (!content || sending || !isAuthenticated) return
 
     setDraft('')
@@ -808,6 +808,7 @@ function App() {
         `/api/conversation/${conversationId}/messages`,
         {
           method: 'POST',
+          headers: {'Idempotency-Key': idempotencyKey,},
           body: JSON.stringify({ content }),
         }
       )
