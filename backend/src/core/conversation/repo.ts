@@ -97,33 +97,38 @@ export const ConversationRepo = {
   //   if (!conversation) {
   //     throw new ApiError({
   //       code: "NOT_FOUND",
-  //       message: "this conversation is not exist!",
+  //       message: "This conversation does not exist!",
   //     });
   //   }
 
-  //   const existingMessage = await prisma.message.findUnique({
-  //     where: {
-  //       conversationId_idempotencyKey_role: {
+  //   try {
+  //     return await prisma.message.create({
+  //       data: {
   //         conversationId: id,
-  //         idempotencyKey,
   //         role: "user",
+  //         content: data.content,
+  //         idempotencyKey,
   //       },
-  //     },
-  //   });
+  //     });
+  //   } catch (error) {
+  //     if ((error as { code?: string }).code !== "P2002") {
+  //       throw error;
+  //     }
 
-  //   if (existingMessage) {
-  //     return existingMessage;
+  //     const existingMessage = await prisma.message.findUnique({
+  //       where: {
+  //         conversationId_idempotencyKey_role: {
+  //           conversationId: id,
+  //           idempotencyKey,
+  //           role: "user",
+  //         },
+  //       },
+  //     });
+
+  //     if (existingMessage) return existingMessage;
+
+  //     throw error;
   //   }
-  //   const message = await prisma.message.create({
-  //     data: {
-  //       conversationId: id,
-  //       role: "user",
-  //       content: data.content,
-  //       idempotencyKey: idempotencyKey,
-  //     },
-  //   });
-
-  //   return message;
   // },
 
   createmessage: async (
@@ -167,12 +172,21 @@ export const ConversationRepo = {
         },
       });
 
-      if (existingMessage) return existingMessage;
+      if (!existingMessage) {
+        throw error;
+      }
 
-      throw error;
+      if (existingMessage.content !== data.content) {
+        throw new ApiError({
+          code: "CONFLICT",
+          message:
+            "This Idempotency-Key was already used with a different request body.",
+        });
+      }
+
+      return existingMessage;
     }
   },
-
   createAssistantMessage: async (
     id: string,
     content: string,

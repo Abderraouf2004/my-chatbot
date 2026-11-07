@@ -42,38 +42,6 @@ export const ConversationService = {
     const data = await ConversationRepo.getById(id, userId);
     return validateObject<Conversation.DTO>(ConversationDTOSchema, data);
   },
-
-  // createmessage: async (
-  //   id: string,
-  //   data: Conversation.CreateMessage,
-  //   userId: string,
-  //   idempotencyKey: string,
-  // ) => {
-  //   const message = await ConversationRepo.createmessage(
-  //     id,
-  //     data,
-  //     userId,
-  //     idempotencyKey,
-  //   );
-
-  //   const aiContent = await generateResponse(data.content);
-
-  //   const assistantMessage = await ConversationRepo.createAssistantMessage(
-  //     id,
-  //     aiContent,
-  //   );
-  //   return {
-  //     userMessage: validateObject<Conversation.DTOMessage>(
-  //       MessageDTOSchema,
-  //       message,
-  //     ),
-  //     assistantMessage: validateObject<Conversation.DTOMessage>(
-  //       MessageDTOSchema,
-  //       assistantMessage,
-  //     ),
-  //   };
-  // },
-
   createmessage: async (
     id: string,
     data: Conversation.CreateMessage,
