@@ -30,12 +30,6 @@ conversation.get(
   ConversationController.getAll,
 );
 
-// conversation.post(
-//   "/:id/messages",
-//   authMiddleware,
-//   validateRequestInput({ params: IdParamSchema, body: CreateMessageSchema }),
-//   ConversationController.createmessage,
-// );
 conversation.post(
   "/:id/messages",
   authMiddleware,
