@@ -37,6 +37,12 @@ class RedisService {
     }
   }
 
+  async disconnect() {
+    if (this.client.isOpen) {
+      await this.client.quit();
+    }
+  }
+
   getClient() {
     return this.client;
   }

@@ -50,3 +50,57 @@ startServer().catch((error) => {
   console.error("Failed to start server:", error);
   process.exit(1);
 });
+
+let isShuttingDown = false;
+
+// async function gracefulShutdown(signal: string) {
+//   if (isShuttingDown) return;
+//   isShuttingDown = true;
+
+//   console.log(`${signal} received. Starting graceful shutdown...`);
+
+//   server.close(async (error) => {
+//     if (error) {
+//       console.error("Error closing HTTP server:", error);
+//       process.exitCode = 1;
+//     }
+
+//     try {
+//       console.log("Closing Redis connection...");
+//       await redisService.disconnect();
+//       console.log("Redis connection closed.");
+//     } catch (error) {
+//       console.error("Error closing Redis:", error);
+//       process.exitCode = 1;
+//     }
+//   });
+// }
+
+async function gracefulShutdown(signal: string) {
+  if (isShuttingDown) return;
+  isShuttingDown = true;
+
+  console.log(`${signal} received. Starting graceful shutdown...`);
+
+  server.close(async (error) => {
+    console.log("HTTP server closed.");
+
+    if (error) {
+      console.error("Error closing HTTP server:", error);
+      process.exitCode = 1;
+    }
+
+    try {
+      console.log("Closing Redis connection...");
+      await redisService.disconnect();
+      console.log("Redis connection closed.");
+    } catch (error) {
+      console.error("Error closing Redis:", error);
+      process.exitCode = 1;
+    }
+  });
+  server.closeIdleConnections?.();
+}
+
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
