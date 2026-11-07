@@ -33,7 +33,7 @@ import { AuthRepo } from "../../src/core/auth/repo";
 import { hash } from "../../src/services/hash";
 import { tokenService } from "../../src/services/token";
 import { redisService } from "../../src/services/redis";
-
+import jwt from "jsonwebtoken";
 const mockedRepo = vi.mocked(AuthRepo);
 const mockedHash = vi.mocked(hash);
 const mockedToken = vi.mocked(tokenService);
@@ -233,6 +233,146 @@ describe("AuthService", () => {
       ).rejects.toMatchObject({
         message: "User not found",
       });
+    });
+  });
+
+  describe("refreshToken", () => {
+    it("should refresh tokens successfully", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue(null),
+        setEx: vi.fn().mockResolvedValue("OK"),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockReturnValue({
+        id: "user-1",
+        type: "refresh",
+      });
+
+      vi.spyOn(jwt, "decode").mockReturnValue({
+        exp: Math.floor(Date.now() / 1000) + 3600,
+      } as never);
+
+      mockedToken.generateToken
+        .mockReturnValueOnce("new-access-token")
+        .mockReturnValueOnce("new-refresh-token");
+
+      const result = await AuthService.refreshToken("old-refresh-token");
+
+      expect(redis.setEx).toHaveBeenCalledWith(
+        "blacklist:old-refresh-token",
+        expect.any(Number),
+        "blacklisted",
+      );
+
+      expect(result).toEqual({
+        accessToken: "new-access-token",
+        refreshToken: "new-refresh-token",
+      });
+    });
+
+    it("should reject a blacklisted refresh token", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue("blacklisted"),
+        setEx: vi.fn(),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      await expect(
+        AuthService.refreshToken("revoked-token"),
+      ).rejects.toMatchObject({
+        message: "Token revoked",
+      });
+    });
+
+    it("should reject when refresh token is missing", async () => {
+      await expect(AuthService.refreshToken(undefined)).rejects.toBeDefined();
+    });
+
+    it("should reject an expired refresh token", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue(null),
+        setEx: vi.fn(),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockReturnValue({
+        id: "user-1",
+        type: "refresh",
+      });
+
+      vi.spyOn(jwt, "decode").mockReturnValue({
+        exp: Math.floor(Date.now() / 1000) - 3600,
+      } as never);
+
+      await expect(
+        AuthService.refreshToken("expired-token"),
+      ).rejects.toMatchObject({
+        message: "Refresh token expired",
+      });
+
+      expect(redis.setEx).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("signOut", () => {
+    it("should blacklist valid access and refresh tokens", async () => {
+      const redis = {
+        setEx: vi.fn().mockResolvedValue("OK"),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockReturnValue({
+        id: "user-1",
+        type: "access",
+      });
+
+      vi.spyOn(jwt, "decode")
+        .mockReturnValueOnce({
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        } as never)
+        .mockReturnValueOnce({
+          exp: Math.floor(Date.now() / 1000) + 3600,
+        } as never);
+
+      await AuthService.signOut("valid-access-token", "valid-refresh-token");
+
+      expect(redis.setEx).toHaveBeenCalledTimes(2);
+    });
+
+    it("should ignore invalid tokens", async () => {
+      const redis = {
+        setEx: vi.fn(),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockImplementation(() => {
+        throw new Error("Invalid token");
+      });
+
+      await AuthService.signOut(
+        "invalid-access-token",
+        "invalid-refresh-token",
+      );
+
+      expect(redis.setEx).not.toHaveBeenCalled();
+    });
+
+    it("should ignore missing tokens", async () => {
+      const redis = {
+        setEx: vi.fn(),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      await AuthService.signOut(undefined, undefined);
+
+      expect(redis.setEx).not.toHaveBeenCalled();
     });
   });
 });
