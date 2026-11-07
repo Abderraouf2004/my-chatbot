@@ -32,11 +32,12 @@ import { AuthService } from "../../src/core/auth/service";
 import { AuthRepo } from "../../src/core/auth/repo";
 import { hash } from "../../src/services/hash";
 import { tokenService } from "../../src/services/token";
+import { redisService } from "../../src/services/redis";
 
 const mockedRepo = vi.mocked(AuthRepo);
 const mockedHash = vi.mocked(hash);
 const mockedToken = vi.mocked(tokenService);
-
+const mockedRedis = vi.mocked(redisService);
 describe("AuthService", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -160,6 +161,77 @@ describe("AuthService", () => {
         }),
       ).rejects.toMatchObject({
         message: "Invalid password",
+      });
+    });
+  });
+  describe("verifyToken", () => {
+    it("should verify a valid access token", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue(null),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockReturnValue({
+        id: "user-1",
+        type: "access",
+      });
+
+      mockedRepo.readById.mockResolvedValue({
+        id: "user-1",
+      } as never);
+
+      const result = await AuthService.verifyToken("valid-access-token");
+
+      expect(result).toEqual({
+        user: {
+          id: "user-1",
+        },
+      });
+
+      expect(redis.get).toHaveBeenCalledWith("blacklist:valid-access-token");
+    });
+
+    it("should reject when access token is missing", async () => {
+      await expect(AuthService.verifyToken(undefined)).rejects.toBeDefined();
+
+      expect(mockedToken.verifyToken).not.toHaveBeenCalled();
+    });
+
+    it("should reject a blacklisted token", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue("blacklisted"),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      await expect(
+        AuthService.verifyToken("revoked-token"),
+      ).rejects.toMatchObject({
+        message: "Token revoked",
+      });
+
+      expect(mockedToken.verifyToken).not.toHaveBeenCalled();
+    });
+
+    it("should reject when user does not exist", async () => {
+      const redis = {
+        get: vi.fn().mockResolvedValue(null),
+      };
+
+      mockedRedis.getClient.mockReturnValue(redis as never);
+
+      mockedToken.verifyToken.mockReturnValue({
+        id: "missing-user",
+        type: "access",
+      });
+
+      mockedRepo.readById.mockResolvedValue(null);
+
+      await expect(
+        AuthService.verifyToken("valid-access-token"),
+      ).rejects.toMatchObject({
+        message: "User not found",
       });
     });
   });
