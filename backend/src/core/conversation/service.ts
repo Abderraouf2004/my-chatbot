@@ -5,7 +5,6 @@ import {
   ConversationDTOSchema,
   MessageDTOSchema,
 } from "../../modules/conversation/conversation.schema";
-// import { ApiError } from "../../errors/api-error";
 import {
   buildPaginationMeta,
   type PaginationQuery,

@@ -84,52 +84,6 @@ export const ConversationRepo = {
       where: { id },
     });
   },
-  // createmessage: async (
-  //   id: string,
-  //   data: Conversation.CreateMessage,
-  //   userId: string,
-  //   idempotencyKey: string,
-  // ) => {
-  //   const conversation = await prisma.conversation.findFirst({
-  //     where: { id, userId },
-  //   });
-
-  //   if (!conversation) {
-  //     throw new ApiError({
-  //       code: "NOT_FOUND",
-  //       message: "This conversation does not exist!",
-  //     });
-  //   }
-
-  //   try {
-  //     return await prisma.message.create({
-  //       data: {
-  //         conversationId: id,
-  //         role: "user",
-  //         content: data.content,
-  //         idempotencyKey,
-  //       },
-  //     });
-  //   } catch (error) {
-  //     if ((error as { code?: string }).code !== "P2002") {
-  //       throw error;
-  //     }
-
-  //     const existingMessage = await prisma.message.findUnique({
-  //       where: {
-  //         conversationId_idempotencyKey_role: {
-  //           conversationId: id,
-  //           idempotencyKey,
-  //           role: "user",
-  //         },
-  //       },
-  //     });
-
-  //     if (existingMessage) return existingMessage;
-
-  //     throw error;
-  //   }
-  // },
 
   createmessage: async (
     id: string,
